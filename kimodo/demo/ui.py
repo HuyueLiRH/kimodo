@@ -467,6 +467,17 @@ def create_gui(
                 "Undo Move",
                 disabled=True,
             )
+            with client.gui.add_folder("End Effector Target", expand_by_default=True):
+                gui_ee_target_dropdown = client.gui.add_dropdown(
+                    "Target",
+                    ("Right Hand", "Left Hand", "Right Foot", "Left Foot"),
+                    initial_value="Right Hand",
+                )
+                gui_ee_target_drag_checkbox = client.gui.add_checkbox(
+                    "Drag Target",
+                    initial_value=False,
+                    hint="In Editing Mode, show a translation gizmo that directly moves this end-effector target and writes a constraint at the current frame.",
+                )
 
             with client.gui.add_folder("Root 2D Options", expand_by_default=True):
                 gui_dense_path_checkbox = client.gui.add_checkbox(
@@ -2142,6 +2153,133 @@ def create_gui(
             gui_cfg_text_weight_slider.visible = val
             gui_cfg_constraint_weight_slider.visible = val
 
+        def _snapshot_drag_start(session: ClientSession) -> None:
+            if not session.motions:
+                return
+            mot = list(session.motions.values())[0]
+            frame_idx = min(session.frame_idx, mot.length - 1)
+            session.undo_drag_snapshot = {
+                "frame_idx": frame_idx,
+                "joints_pos": mot.get_joints_pos(frame_idx),
+                "joints_rot": mot.get_joints_rot(frame_idx),
+            }
+            gui_undo_drag_button.disabled = False
+
+        def _ee_target_spec() -> tuple[str, list[str], str]:
+            target_label = str(gui_ee_target_dropdown.value)
+            joint_root, effector_type = {
+                "Left Hand": ("LeftHand", "left-hand"),
+                "Right Hand": ("RightHand", "right-hand"),
+                "Left Foot": ("LeftFoot", "left-foot"),
+                "Right Foot": ("RightFoot", "right-foot"),
+            }[target_label]
+            return target_label, [joint_root, "Hips"], effector_type
+
+        def _ensure_ee_target_keyframe(
+            event_client: viser.ClientHandle,
+            session: ClientSession,
+            track_name: str,
+            frame_idx: int,
+        ) -> str:
+            track_id = session.timeline_data["tracks_ids"][track_name]
+            for keyframe_id, keyframe_data in session.timeline_data["keyframes"].items():
+                if keyframe_data["track_id"] == track_id and int(keyframe_data["frame"]) == int(frame_idx):
+                    return keyframe_id
+
+            keyframe_id = event_client.timeline.add_keyframe(track_id, frame_idx)
+            keyframe_data = event_client.timeline._keyframes.get(keyframe_id)
+            session.timeline_data["keyframes"][keyframe_id] = {
+                "frame": frame_idx,
+                "track_id": track_id,
+                "locked": bool(keyframe_data.locked) if keyframe_data is not None else False,
+                "opacity": keyframe_data.opacity if keyframe_data is not None else 1.0,
+                "value": keyframe_data.value if keyframe_data is not None else None,
+            }
+            return keyframe_id
+
+        def _update_ee_target_constraint(
+            event_client: viser.ClientHandle,
+            session: ClientSession,
+            frame_idx: int,
+            joints_pos: np.ndarray,
+            joints_rot: np.ndarray,
+            joint_names: list[str],
+            end_effector_type: str,
+        ) -> None:
+            track_name = {
+                "left-hand": "Left Hand",
+                "right-hand": "Right Hand",
+                "left-foot": "Left Foot",
+                "right-foot": "Right Foot",
+            }[end_effector_type]
+            with session.timeline_data["keyframe_update_lock"]:
+                keyframe_id = _ensure_ee_target_keyframe(event_client, session, track_name, frame_idx)
+                session.constraints["End-Effectors"].add_keyframe(
+                    keyframe_id,
+                    frame_idx,
+                    joints_pos,
+                    joints_rot,
+                    joint_names,
+                    end_effector_type,
+                    exists_ok=True,
+                )
+            apply_constraint_overlay_visibility(session)
+
+        def _refresh_ee_target_gizmo(event_client: viser.ClientHandle, session: ClientSession) -> None:
+            if not session.motions:
+                return
+            motion = list(session.motions.values())[0]
+            if not session.edit_mode or not gui_ee_target_drag_checkbox.value:
+                motion.clear_end_effector_target_gizmo()
+                return
+
+            target_label, joint_names, end_effector_type = _ee_target_spec()
+
+            def _on_target_update(
+                frame_idx: int,
+                joints_pos: np.ndarray,
+                joints_rot: np.ndarray,
+                updated_joint_names: list[str],
+                updated_effector_type: str,
+            ) -> None:
+                _update_ee_target_constraint(
+                    event_client,
+                    session,
+                    frame_idx,
+                    joints_pos,
+                    joints_rot,
+                    updated_joint_names,
+                    updated_effector_type,
+                )
+
+            motion.add_end_effector_target_gizmo(
+                session.constraints,
+                joint_names,
+                end_effector_type,
+                on_drag_start=lambda: _snapshot_drag_start(session),
+                on_target_update=_on_target_update,
+            )
+            event_client.add_notification(
+                title="End-effector target enabled",
+                body=f"Drag the {target_label} target gizmo in the 3D view.",
+                auto_close_seconds=4.0,
+                color="blue",
+            )
+
+        @gui_ee_target_drag_checkbox.on_update
+        def _(event: viser.GuiEvent) -> None:
+            session = get_active_session(event.client)
+            if session is None:
+                return
+            _refresh_ee_target_gizmo(event.client, session)
+
+        @gui_ee_target_dropdown.on_update
+        def _(event: viser.GuiEvent) -> None:
+            session = get_active_session(event.client)
+            if session is None:
+                return
+            _refresh_ee_target_gizmo(event.client, session)
+
         def exit_editing_mode(session: ClientSession):
             gui_edit_constraint_button.label = "Enter Editing Mode"
             gui_generate_button.disabled = False
@@ -2226,14 +2364,7 @@ def create_gui(
                         _update_dense_path(mot, session)
 
                 def _on_gizmo_drag_start():
-                    mot = list(session.motions.values())[0]
-                    frame_idx = min(session.frame_idx, mot.length - 1)
-                    session.undo_drag_snapshot = {
-                        "frame_idx": frame_idx,
-                        "joints_pos": mot.get_joints_pos(frame_idx),
-                        "joints_rot": mot.get_joints_rot(frame_idx),
-                    }
-                    gui_undo_drag_button.disabled = False
+                    _snapshot_drag_start(session)
 
                 motion.add_root_translation_gizmo(
                     session.constraints,
@@ -2246,6 +2377,7 @@ def create_gui(
                     space=gizmo_space,
                     on_drag_start=_on_gizmo_drag_start,
                 )
+                _refresh_ee_target_gizmo(event_client, session)
             else:
                 exit_editing_mode(session)
 

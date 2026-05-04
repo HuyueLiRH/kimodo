@@ -63,6 +63,11 @@ class CharacterMotion:
         self.gizmo_space: Literal["world", "local"] = "local"
         self._drag_start_world_rot: list = []
         self._joint_gizmo_dragging: list[bool] = []
+        self.ee_target_gizmo = None
+        self.updating_ee_target_gizmo = False
+        self.ee_target_joint_names: list[str] = []
+        self.ee_target_end_effector_type: Optional[str] = None
+        self.ee_target_constraints: Optional[dict] = None
 
     def precompute_mesh_info(self):
         if self.character.skeleton_mesh is not None:
@@ -99,6 +104,8 @@ class CharacterMotion:
                         joint_gizmo.wxyz = (1.0, 0.0, 0.0, 0.0)
                     else:
                         joint_gizmo.wxyz = tf.SO3.from_matrix(self.joints_rot[self.cur_frame_idx, i].cpu().numpy()).wxyz
+        if self.ee_target_gizmo is not None and not self.updating_ee_target_gizmo:
+            self.ee_target_gizmo.position = self.get_end_effector_target_position(self.ee_target_joint_names)
 
     def update_pose_at_frame(
         self,
@@ -180,6 +187,36 @@ class CharacterMotion:
         root_pos = self.joints_pos[self.cur_frame_idx, self.skeleton.root_idx].clone()
         root_pos[1] = 0.0
         return to_numpy(root_pos)
+
+    def _expand_end_effector_joint_indices(self, joint_names: list[str]) -> list[int]:
+        joint_groups = {
+            "LeftHand": self.skeleton.left_hand_joint_names,
+            "RightHand": self.skeleton.right_hand_joint_names,
+            "LeftFoot": self.skeleton.left_foot_joint_names,
+            "RightFoot": self.skeleton.right_foot_joint_names,
+        }
+        indices = []
+        for joint_name in joint_names:
+            if joint_name == "Hips":
+                continue
+            if joint_name not in joint_groups:
+                continue
+            indices.extend([self.skeleton.bone_order_names_index[name] for name in joint_groups[joint_name]])
+        return list(dict.fromkeys(indices))
+
+    def get_end_effector_target_position(self, joint_names: list[str]) -> np.ndarray:
+        indices = self._expand_end_effector_joint_indices(joint_names)
+        if len(indices) == 0:
+            return self.joints_pos[self.cur_frame_idx, self.skeleton.root_idx].cpu().numpy()
+
+        constraints = self.ee_target_constraints or {}
+        ee_constraints = constraints.get("End-Effectors")
+        if ee_constraints is not None and self.cur_frame_idx in ee_constraints.keyframes:
+            current = ee_constraints.keyframes[self.cur_frame_idx]
+            if any(joint_name in current["joint_names"] for joint_name in joint_names):
+                return to_numpy(current["joints_pos"])[indices[0]]
+
+        return self.joints_pos[self.cur_frame_idx, indices[0]].cpu().numpy()
 
     def get_projected_root_pos(self, start_frame_idx: int, end_frame_idx: int = None) -> np.ndarray:
         """If requested frames are out of range, simply pads with the last frame to get expected
@@ -423,6 +460,114 @@ class CharacterMotion:
                     root_2d.update_line_segments()
             if on_2d_root_drag_end is not None:
                 on_2d_root_drag_end()
+
+    def clear_end_effector_target_gizmo(self):
+        self.updating_ee_target_gizmo = True
+        if self.ee_target_gizmo is not None:
+            self.server.scene.remove_by_name(self.ee_target_gizmo.name)
+            self.ee_target_gizmo = None
+        self.ee_target_joint_names = []
+        self.ee_target_end_effector_type = None
+        self.ee_target_constraints = None
+        self.updating_ee_target_gizmo = False
+
+    def add_end_effector_target_gizmo(
+        self,
+        constraints: dict,
+        joint_names: list[str],
+        end_effector_type: str,
+        on_drag_start: Optional[Callable[[], None]] = None,
+        on_target_update: Optional[
+            Callable[[int, np.ndarray, np.ndarray, list[str], str], None]
+        ] = None,
+    ):
+        """Add a translation gizmo that directly moves an end-effector target.
+
+        This updates the displayed pose at the current frame and calls on_target_update so the UI
+        can create/update the matching end-effector constraint and timeline keyframe.
+        """
+        self.clear_end_effector_target_gizmo()
+        self.ee_target_joint_names = list(joint_names)
+        self.ee_target_end_effector_type = end_effector_type
+        self.ee_target_constraints = constraints
+
+        init_position = self.get_end_effector_target_position(self.ee_target_joint_names)
+        self.ee_target_gizmo = self.server.scene.add_transform_controls(
+            f"/{self.name}/gizmo_end_effector_target",
+            scale=0.18,
+            line_width=4.0,
+            active_axes=(True, True, True),
+            disable_axes=False,
+            disable_sliders=False,
+            disable_rotations=True,
+            depth_test=False,
+            position=init_position,
+            space="world",
+        )
+
+        @self.ee_target_gizmo.on_drag_start
+        def _(_):
+            if on_drag_start is not None:
+                on_drag_start()
+
+        @self.ee_target_gizmo.on_update
+        def _(_):
+            if self.cur_frame_idx is None:
+                return
+
+            target_indices = self._expand_end_effector_joint_indices(self.ee_target_joint_names)
+            if len(target_indices) == 0:
+                return
+
+            frame_idx = self.cur_frame_idx
+            ee_constraints = constraints.get("End-Effectors")
+            current_constraint = (
+                ee_constraints.keyframes.get(frame_idx)
+                if ee_constraints is not None and frame_idx in ee_constraints.keyframes
+                else None
+            )
+            if current_constraint is not None:
+                cur_joints_pos = to_torch(
+                    current_constraint["joints_pos"],
+                    device=self.joints_pos.device,
+                    dtype=self.joints_pos.dtype,
+                ).clone()
+                cur_joints_rot = to_torch(
+                    current_constraint["joints_rot"],
+                    device=self.joints_rot.device,
+                    dtype=self.joints_rot.dtype,
+                ).clone()
+            else:
+                cur_joints_pos = self.joints_pos[frame_idx].clone()
+                cur_joints_rot = self.joints_rot[frame_idx].clone()
+
+            new_target_pos = to_torch(
+                self.ee_target_gizmo.position,
+                device=self.joints_pos.device,
+                dtype=self.joints_pos.dtype,
+            )
+            delta = new_target_pos - cur_joints_pos[target_indices[0]]
+            if torch.norm(delta) < 1e-8:
+                return
+            cur_joints_pos[target_indices] += delta[None]
+
+            self.updating_ee_target_gizmo = True
+            self.update_pose_at_frame(
+                frame_idx,
+                joints_pos=cur_joints_pos,
+                joints_rot=cur_joints_rot,
+            )
+            self.set_frame(frame_idx)
+            self.updating_ee_target_gizmo = False
+
+            if on_target_update is not None:
+                on_target_update(
+                    frame_idx,
+                    cur_joints_pos.detach().cpu().numpy(),
+                    cur_joints_rot.detach().cpu().numpy(),
+                    self.ee_target_joint_names,
+                    self.ee_target_end_effector_type,
+                )
 
     def add_joint_gizmos(
         self,
@@ -713,6 +858,7 @@ class CharacterMotion:
             for joint_gizmo in self.joint_gizmos:
                 self.server.scene.remove_by_name(joint_gizmo.name)
             self.joint_gizmos = None
+        self.clear_end_effector_target_gizmo()
         self._drag_start_world_rot = []
         self._joint_gizmo_dragging = []
         self.updating_root_translation_gizmo = False
