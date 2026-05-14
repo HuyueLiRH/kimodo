@@ -1,0 +1,41 @@
+{
+  "generation_defaults": {
+    "variant": "endpoint_wrist",
+    "cfg_text": 2.4,
+    "cfg_constraint": 4.0,
+    "diffusion_steps": 200,
+    "num_samples": 1,
+    "frame_plan": 210,
+    "preemphasis_preset": "flat_B",
+    "heading_mode": "none",
+    "prompt_variant": "level_full_width",
+    "num_transition_frames": 5,
+    "active_hand": "right",
+    "disable_y_closed_loop": true,
+    "disable_return_constraint": true,
+    "post_processing": false
+  },
+  "pipelines": {
+    "outside_surface": [
+      "A person stands still and raises the right hand toward the outside surface of a small wall patch.",
+      "A person stands still and slides the right palm flat on the outside surface of a wall from left to right.",
+      "A person stands still and slides the right palm flat on the outside surface of a wall from right to left.",
+      "A person stands still and keeps the right hand on the outside surface while making three straight horizontal brush strokes.",
+      "A person stands still and lowers the right hand away from the outside surface of the wall."
+    ],
+    "left_arm_relaxed": [
+      "A person stands balanced in place in front of a small wall patch, with the left arm relaxed by the side and the right hand ready to brush.",
+      "A person keeps the left arm relaxed by the side while the right hand brushes one straight horizontal stroke from left to right on a wall.",
+      "A person keeps the left arm relaxed by the side while the right hand brushes one straight horizontal stroke from right to left on a wall.",
+      "A person keeps the left arm relaxed by the side while the right hand brushes one straight horizontal stroke from left to right on a wall.",
+      "A person relaxes the left arm by the side and smoothly lowers the right hand after brushing."
+    ],
+    "seed_upright_style": [
+      "A person is standing in an upright stance in front of a wall.",
+      "A person standing in an upright stance leans forward and moves the right hand across the wall from left to right.",
+      "A person leaning forward moves the right hand across the wall from right to left.",
+      "A person leaning forward moves the right hand across the wall from left to right.",
+      "A person leaning forward lowers the right hand from the wall."
+    ]
+  }
+}

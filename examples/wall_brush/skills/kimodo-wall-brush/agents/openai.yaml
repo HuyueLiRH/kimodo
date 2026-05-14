@@ -1,0 +1,4 @@
+interface:
+  display_name: "Kimodo Wall Brush"
+  short_description: "Generate precise straight-row wall brushing motions"
+  default_prompt: "Use this skill to generate, line-IK refine, and validate a precise row-by-row wall brushing motion with Kimodo G1."

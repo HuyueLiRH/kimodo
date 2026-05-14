@@ -1,0 +1,65 @@
+{
+  "task": "kimodo_g1_wall_brush",
+  "current_default": true,
+  "full_pipeline_spec": "skills/kimodo-wall-brush/default_wall_brush_pipeline.json",
+  "pipeline_runner": "scripts/run_wall_brush_default_pipeline.py",
+  "method_label": "SOFT_FULL_BODY_PROJECTION_TEMPORAL_CONTINUITY_FILTERED",
+  "sample": "logs/wall_brush_g1_v36_soft_full_body_projection/seed_C_final_edge_plus_continuity_lam5p0_result/sample_00/motion.npz",
+  "gallery_copy": "logs/wall_brush_g1_v36_soft_full_body_projection/gallery_selected/DEFAULT_wall_brush_v36_SFBP_CONT_edge_plus_lam5_best_visual.npz",
+  "source_seed": "created by the current run's V35 noise-search stage from the current task_spec",
+  "pipeline": [
+    "recognize wall_brush task and generate task_spec.json",
+    "generate current-run native multi-prompt samples from task_spec constraints",
+    "score current-run native samples and select seed_B",
+    "run V35 noise-search from current-run seed_B and select seed_C",
+    "run V36 soft full-body projection only on current-run seed_C",
+    "apply edge_plus transition smoothing",
+    "apply temporal continuity smoothing with lambda 5.0"
+  ],
+  "generation": {
+    "script": "scripts/run_wall_brush_default_pipeline.py",
+    "task_spec_generator": "scripts/create_wall_brush_task_spec.py",
+    "native_generation_script": "scripts/remote_wall_brush_multiprompt_constraint_v34_flat.py",
+    "noise_search_script": "scripts/remote_wall_brush_v35_noise_search.py",
+    "projection_script": "scripts/remote_wall_brush_v36_soft_projection.py",
+    "projection_only_seed": "seed_C_created_by_current_run"
+  },
+  "generalization_validation": {
+    "script": "scripts/run_wall_brush_generalization_batch.py",
+    "output_root": "logs/wall_brush_generalization",
+    "variants": [
+      "baseline_center",
+      "left_lower_close",
+      "right_upper_mid",
+      "wide_center_mid",
+      "small_right_close"
+    ],
+    "rule": "Each variant must run the same from-scratch prompt->task_spec->native generation->rerank->current-run seed_C->soft full-body projection->continuity filter pipeline; do not reuse an old seed_C or old best npz."
+  },
+  "post_filter": {
+    "script": "scripts/postprocess_wall_brush_v36_edge_filter.py",
+    "profile": "edge_plus",
+    "strength": 1.0,
+    "continuity_lambda": 5.0,
+    "continuity_key_weight": 40.0
+  },
+  "metrics": {
+    "stroke_line_mean_error_m": 0.006389,
+    "stroke_line_max_error_m": 0.014871,
+    "avg_x_progress": 0.810749,
+    "avg_x_coverage": 0.810749,
+    "row_y_range_mean_m": 0.002149,
+    "wall_penetration_m": 0.0,
+    "max_right_hand_acceleration_m_per_frame2": 0.025077,
+    "tail_root_yaw_path_deg": 12.062983
+  },
+  "notes": [
+    "Do not treat this as only a saved seed or saved npz. The reproducible default process is defined in full_pipeline_spec and starts from prompt + native constraints.",
+    "The current default wall-brush generation flow does not use an old seed_C as input.",
+    "seed_C is an intermediate artifact generated from the current task_spec by the V35 stage.",
+    "The generic V36 research script can still run seed A/B/C for comparison, but the from-scratch default selected pipeline uses the current-run seed_C with --only_seed seed_C.",
+    "This is not NO-IK.",
+    "This is not right-arm FABRIK, not line IK, and not return IK.",
+    "Use it as the default visual wall-brush method unless the user asks for native no-IK only."
+  ]
+}

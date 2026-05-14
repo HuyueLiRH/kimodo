@@ -146,6 +146,11 @@ outputs
 /batch*.sh
 checkpoints/**/test/*
 nohup.out
+examples/wall_brush/outputs/
+examples/wall_brush/logs/
+examples/wall_brush/**/*.npz
+examples/wall_brush/**/*.html
+examples/wall_brush/**/*.csv
 
 *.swp
 *.swo
