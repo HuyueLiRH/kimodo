@@ -91,6 +91,36 @@ class WallBrushWebEquivalentTests(unittest.TestCase):
         torch.testing.assert_close(pos[1, endpoint_index], torch.tensor(targets[1]["point"]))
         torch.testing.assert_close(pos[1, wrist_index], default_wrist + expected_delta)
 
+    def test_wall_brush_preset_can_be_loaded_as_generic_web_equivalent_task(self):
+        from kimodo.demo.wall_brush import wall_brush_preset_metadata
+        from kimodo.demo.web_equivalent import load_task_spec_dict
+
+        preset = wall_brush_preset_metadata()
+        spec = load_task_spec_dict(
+            {
+                "model": preset["model"],
+                "seed": preset["seed"],
+                "num_samples": preset["num_samples"],
+                "prompts": preset["prompts"],
+                "segments": preset["segments"],
+                "diffusion_steps": preset["num_denoising_steps"],
+                "cfg_type": preset["cfg_type"],
+                "cfg_weight": preset["cfg_weight"],
+                "num_transition_frames": preset["num_transition_frames"],
+                "post_processing": preset["post_processing"],
+                "end_effector": {
+                    "type": "right-hand",
+                    "targets": preset["right_hand_targets"],
+                },
+            }
+        )
+
+        self.assertEqual(spec.model, "kimodo-g1-rp")
+        self.assertEqual(spec.segments, [30, 42, 30])
+        self.assertFalse(spec.post_processing)
+        self.assertEqual(spec.end_effector.type, "right-hand")
+        self.assertEqual(len(spec.end_effector.targets), 10)
+
 
 if __name__ == "__main__":
     unittest.main()
