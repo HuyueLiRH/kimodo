@@ -1,0 +1,3 @@
+# Use Web-Equivalent Generation for Constrained Motion Priors
+
+For constrained building-action prior generation, use the generic web-equivalent generation path that builds end-effector constraints in memory and can reuse demo text embedding cache. Remove the older task-specific wall-brush generation path instead of preserving it as a compatibility wrapper, because it has already produced misleading behavior relative to the web UI and can confuse future experiments. The trade-off is that old commands may break, but preserving one canonical generation path is more important for avoiding invalid prior-motion data.

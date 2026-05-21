@@ -1,0 +1,217 @@
+{
+  "task_name": "one_row_wall_brush_first_stage",
+  "model": "kimodo-g1-rp",
+  "duration_frames": 102,
+  "constraints": [
+    {
+      "label": "approach_1",
+      "end_effector": "right-hand",
+      "frame": 10,
+      "position": [-0.1745, 0.72, 0.295],
+      "true_point": [-0.155, 0.89, 0.295],
+      "coordinate_frame": "world",
+      "used_for_generation": true,
+      "show_in_review": true,
+      "used_for_postprocess": true,
+      "role": "approach"
+    },
+    {
+      "label": "approach_2",
+      "end_effector": "right-hand",
+      "frame": 20,
+      "position": [-0.1308, 0.738, 0.312],
+      "true_point": [-0.132, 0.908, 0.312],
+      "coordinate_frame": "world",
+      "used_for_generation": true,
+      "show_in_review": true,
+      "used_for_postprocess": true,
+      "role": "approach"
+    },
+    {
+      "label": "approach_final",
+      "end_effector": "right-hand",
+      "frame": 29,
+      "position": [-0.108, 0.75, 0.32],
+      "true_point": [-0.12, 0.92, 0.32],
+      "coordinate_frame": "world",
+      "used_for_generation": true,
+      "show_in_review": true,
+      "used_for_postprocess": true,
+      "role": "brush_line_start"
+    },
+    {
+      "label": "row_1_point_1",
+      "end_effector": "right-hand",
+      "frame": 36,
+      "position": [-0.108, 0.75, 0.32],
+      "true_point": [-0.12, 0.92, 0.32],
+      "wrist_point": [-0.108, 0.735, 0.24],
+      "use_wrist": true,
+      "coordinate_frame": "world",
+      "used_for_generation": true,
+      "show_in_review": true,
+      "used_for_postprocess": true,
+      "role": "brush_stroke_point"
+    },
+    {
+      "label": "row_1_point_2",
+      "end_effector": "right-hand",
+      "frame": 42,
+      "position": [-0.0168, 0.75, 0.32],
+      "true_point": [-0.072, 0.92, 0.32],
+      "coordinate_frame": "world",
+      "used_for_generation": true,
+      "show_in_review": true,
+      "used_for_postprocess": true,
+      "role": "brush_stroke_point"
+    },
+    {
+      "label": "row_1_point_3",
+      "end_effector": "right-hand",
+      "frame": 48,
+      "position": [0.0744, 0.75, 0.32],
+      "true_point": [-0.024, 0.92, 0.32],
+      "coordinate_frame": "world",
+      "used_for_generation": true,
+      "show_in_review": true,
+      "used_for_postprocess": true,
+      "role": "brush_stroke_point"
+    },
+    {
+      "label": "row_1_point_4",
+      "end_effector": "right-hand",
+      "frame": 54,
+      "position": [0.1656, 0.75, 0.32],
+      "true_point": [0.024, 0.92, 0.32],
+      "coordinate_frame": "world",
+      "used_for_generation": true,
+      "show_in_review": true,
+      "used_for_postprocess": true,
+      "role": "brush_stroke_point"
+    },
+    {
+      "label": "row_1_point_5",
+      "end_effector": "right-hand",
+      "frame": 60,
+      "position": [0.2568, 0.75, 0.32],
+      "true_point": [0.072, 0.92, 0.32],
+      "coordinate_frame": "world",
+      "used_for_generation": true,
+      "show_in_review": true,
+      "used_for_postprocess": true,
+      "role": "brush_stroke_point"
+    },
+    {
+      "label": "row_1_point_6",
+      "end_effector": "right-hand",
+      "frame": 66,
+      "position": [0.348, 0.75, 0.32],
+      "true_point": [0.12, 0.92, 0.32],
+      "wrist_point": [0.348, 0.735, 0.24],
+      "use_wrist": true,
+      "coordinate_frame": "world",
+      "used_for_generation": true,
+      "show_in_review": true,
+      "used_for_postprocess": true,
+      "role": "brush_stroke_point"
+    },
+    {
+      "label": "return_final",
+      "end_effector": "right-hand",
+      "frame": 101,
+      "position": [-0.14633791, 0.86423099, 0.29977581],
+      "true_point": [-0.14633791, 0.86423099, 0.29977581],
+      "coordinate_frame": "world",
+      "used_for_generation": true,
+      "show_in_review": true,
+      "used_for_postprocess": false,
+      "role": "natural_stop"
+    }
+  ],
+  "candidates": [
+    {
+      "name": "outside_surface",
+      "seed": 7023,
+      "prompt_strategy": "composed_action_prompt",
+      "prompt_segments": [
+        {
+          "label": "approach",
+          "text": "A person stands still and moves the right hand directly toward the left edge of the outside surface of a small wall patch.",
+          "start_frame": 0,
+          "end_frame": 29,
+          "segment_source": "ai_suggested"
+        },
+        {
+          "label": "brush",
+          "text": "A person stands still and slides the right palm flat on the outside surface of a wall in one short straight horizontal stroke from left to right.",
+          "start_frame": 30,
+          "end_frame": 71,
+          "segment_source": "ai_suggested"
+        },
+        {
+          "label": "stop",
+          "text": "A person stands still, lowers the right hand directly to a neutral resting position beside the right thigh, and stops.",
+          "start_frame": 72,
+          "end_frame": 101,
+          "segment_source": "ai_suggested"
+        }
+      ]
+    },
+    {
+      "name": "left_arm_relaxed",
+      "seed": 7023,
+      "prompt_strategy": "composed_action_prompt",
+      "prompt_segments": [
+        {
+          "label": "approach",
+          "text": "A person stands balanced in place in front of a small wall patch, keeps the left arm relaxed by the side, and moves the right hand directly toward the left edge of the wall patch.",
+          "start_frame": 0,
+          "end_frame": 29,
+          "segment_source": "ai_suggested"
+        },
+        {
+          "label": "brush",
+          "text": "A person keeps the left arm relaxed by the side while the right hand brushes one short straight horizontal stroke from left to right on a wall.",
+          "start_frame": 30,
+          "end_frame": 71,
+          "segment_source": "ai_suggested"
+        },
+        {
+          "label": "stop",
+          "text": "A person keeps the left arm relaxed by the side, lowers the right hand directly to a neutral resting position beside the right thigh, and stops.",
+          "start_frame": 72,
+          "end_frame": 101,
+          "segment_source": "ai_suggested"
+        }
+      ]
+    },
+    {
+      "name": "seed_upright_style",
+      "seed": 7023,
+      "prompt_strategy": "composed_action_prompt",
+      "prompt_segments": [
+        {
+          "label": "approach",
+          "text": "A person stands in an upright stance in front of a wall and moves the right hand directly toward the left edge of a small wall patch.",
+          "start_frame": 0,
+          "end_frame": 29,
+          "segment_source": "ai_suggested"
+        },
+        {
+          "label": "brush",
+          "text": "A person standing in an upright stance leans forward slightly and moves the right hand across the wall from left to right in one short horizontal stroke.",
+          "start_frame": 30,
+          "end_frame": 71,
+          "segment_source": "ai_suggested"
+        },
+        {
+          "label": "stop",
+          "text": "A person returns to an upright stance, lowers the right hand directly to a neutral resting position beside the right thigh, and stops.",
+          "start_frame": 72,
+          "end_frame": 101,
+          "segment_source": "ai_suggested"
+        }
+      ]
+    }
+  ]
+}

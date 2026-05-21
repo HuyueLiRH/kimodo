@@ -1,4 +1,5 @@
 import unittest
+from pathlib import Path
 
 import torch
 
@@ -37,6 +38,12 @@ class FakeG1Skeleton:
 
 
 class WallBrushWebEquivalentTests(unittest.TestCase):
+    def test_legacy_wall_brush_entry_point_is_not_supported(self):
+        pyproject = Path("pyproject.toml").read_text(encoding="utf-8")
+
+        self.assertNotIn("kimodo_wall_brush_one_row", pyproject)
+        self.assertIn("kimodo_web_equiv_gen", pyproject)
+
     def test_preset_declares_raw_web_equivalent_one_row_generation(self):
         from kimodo.demo.wall_brush import WALL_BRUSH_ONE_ROW_PRESET
 
