@@ -12,6 +12,10 @@ from typing import Any, Callable
 
 import numpy as np
 
+CONSTRAINT_MARKER_RADIUS = 0.012
+CONSTRAINT_LABEL_OFFSET = np.array([0.0, 0.035, 0.0], dtype=np.float64)
+TARGET_LINE_WIDTH = 2.0
+
 
 @dataclass(frozen=True)
 class PriorMotionVariant:
@@ -116,6 +120,7 @@ class PriorViewerApp:
             "fps": 30.0,
             "last_frame_time": 0.0,
             "show_constraints": True,
+            "show_constraint_labels": False,
             "show_targets": True,
         }
         self._client_state[client.client_id] = state
@@ -184,6 +189,7 @@ class PriorViewerApp:
             mesh_checkbox = client.gui.add_checkbox("Show G1 Mesh", initial_value=True)
             skeleton_checkbox = client.gui.add_checkbox("Show Skeleton", initial_value=False)
             constraints_checkbox = client.gui.add_checkbox("Show Constraint Points", initial_value=True)
+            constraint_labels_checkbox = client.gui.add_checkbox("Show Constraint Labels", initial_value=False)
             target_checkbox = client.gui.add_checkbox("Show Target Lines", initial_value=True)
 
         state["gui"] = {
@@ -195,6 +201,7 @@ class PriorViewerApp:
             "mesh": mesh_checkbox,
             "skeleton": skeleton_checkbox,
             "constraints": constraints_checkbox,
+            "constraint_labels": constraint_labels_checkbox,
             "targets": target_checkbox,
         }
 
@@ -261,6 +268,11 @@ class PriorViewerApp:
             state["show_constraints"] = constraints_checkbox.value
             self._set_overlay_visibility(state)
 
+        @constraint_labels_checkbox.on_update
+        def _constraint_labels_changed(_event: Any) -> None:
+            state["show_constraint_labels"] = constraint_labels_checkbox.value
+            self._set_overlay_visibility(state)
+
         @target_checkbox.on_update
         def _targets_changed(_event: Any) -> None:
             state["show_targets"] = target_checkbox.value
@@ -325,33 +337,31 @@ class PriorViewerApp:
         client.timeline.set_current_frame(0)
 
     def _add_overlays(self, state: dict[str, Any], candidate: PriorViewerCandidate) -> None:
-        from kimodo.viz.scene import WaypointMesh
-
         client = state["client"]
         overlays = []
         visible_constraints = state.get("show_constraints", True)
+        visible_constraint_labels = visible_constraints and state.get("show_constraint_labels", False)
         for constraint in candidate.constraints:
             if not constraint.get("show_in_review", True):
                 continue
             position = np.asarray(constraint["position"], dtype=np.float64)
-            waypoint = WaypointMesh(
-                f"/prior_constraints/{constraint['label']}",
+            marker = _add_constraint_marker(
                 client,
-                position=position,
-                color=(255, 80, 96),
+                f"/prior_constraints/{constraint['label']}/marker",
+                position,
+                visible_constraints,
             )
-            waypoint.set_visible(visible_constraints)
-            overlays.append(("constraint", waypoint))
+            overlays.append(("constraint", marker))
             label = client.scene.add_label(
                 name=f"/prior_constraints/{constraint['label']}_label",
                 text=f"{constraint['label']} @ {constraint['frame']}",
-                position=position + np.array([0.0, 0.05, 0.0]),
+                position=position + CONSTRAINT_LABEL_OFFSET,
                 font_size_mode="screen",
-                font_screen_scale=0.7,
+                font_screen_scale=0.45,
                 anchor="bottom-center",
             )
-            label.visible = visible_constraints
-            overlays.append(("constraint", label))
+            label.visible = visible_constraint_labels
+            overlays.append(("constraint_label", label))
 
         line_points = _target_line_segments(candidate.constraints)
         if line_points:
@@ -359,7 +369,7 @@ class PriorViewerApp:
                 name="/prior_targets/brush_lines",
                 points=np.asarray(line_points, dtype=np.float64),
                 colors=(102, 217, 255),
-                line_width=5.0,
+                line_width=TARGET_LINE_WIDTH,
             )
             line.visible = state.get("show_targets", True)
             overlays.append(("target", line))
@@ -367,7 +377,7 @@ class PriorViewerApp:
 
     def _set_overlay_visibility(self, state: dict[str, Any]) -> None:
         for kind, handle in state.get("overlays", []):
-            visible = state.get("show_constraints", True) if kind == "constraint" else state.get("show_targets", True)
+            visible = _overlay_visible(kind, state)
             if hasattr(handle, "set_visible"):
                 handle.set_visible(visible)
             elif hasattr(handle, "visible"):
@@ -509,6 +519,28 @@ def _load_motion_tensors(motion_path: Path):
         torch.as_tensor(joints_rot, dtype=torch.float32),
         foot_contacts,
     )
+
+
+def _add_constraint_marker(client: Any, name: str, position: np.ndarray, visible: bool):
+    import trimesh
+
+    marker = trimesh.creation.icosphere(subdivisions=2, radius=CONSTRAINT_MARKER_RADIUS)
+    return client.scene.add_mesh_simple(
+        name=name,
+        vertices=marker.vertices,
+        faces=marker.faces,
+        position=position,
+        color=(255, 80, 96),
+        visible=visible,
+    )
+
+
+def _overlay_visible(kind: str, state: dict[str, Any]) -> bool:
+    if kind == "constraint":
+        return state.get("show_constraints", True)
+    if kind == "constraint_label":
+        return state.get("show_constraints", True) and state.get("show_constraint_labels", False)
+    return state.get("show_targets", True)
 
 
 def _coerce_motion_array(array: np.ndarray, *, dims: int) -> np.ndarray:

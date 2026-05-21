@@ -170,6 +170,14 @@ class PriorViewerTests(unittest.TestCase):
         self.assertEqual(FakeServer.instances[0].kwargs["port"], 7861)
         self.assertIsNotNone(FakeServer.instances[0].connect_callback)
 
+    def test_prior_viewer_uses_small_review_constraint_markers(self):
+        content = Path("kimodo/demo/prior_viewer.py").read_text(encoding="utf-8")
+
+        self.assertIn("CONSTRAINT_MARKER_RADIUS", content)
+        self.assertIn("Show Constraint Labels", content)
+        self.assertIn("show_constraint_labels", content)
+        self.assertNotIn("WaypointMesh", content)
+
     def test_workspace_launch_script_uses_local_venv_and_prior_viewer_entrypoint(self):
         script = Path("scripts/start_prior_viewer.sh")
 
