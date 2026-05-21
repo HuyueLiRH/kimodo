@@ -440,19 +440,29 @@ def write_review_gallery(
   <title>{title} prior review</title>
   <style>
     body {{ font-family: system-ui, sans-serif; margin: 24px; color: #1f2933; }}
-    .viewer {{ display: grid; grid-template-columns: minmax(0, 1fr) 320px; gap: 16px; align-items: start; }}
+    .viewer {{ display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) 320px; gap: 16px; align-items: start; }}
+    .view-pane {{ min-width: 0; }}
+    .view-pane h2 {{ margin: 0 0 8px; font-size: 16px; }}
     canvas {{ width: 100%; min-height: 520px; background: #0f1720; border-radius: 8px; }}
     .controls {{ display: grid; gap: 10px; }}
     select, input, button {{ font: inherit; padding: 7px 9px; }}
     .candidate {{ border: 1px solid #d8dee9; border-radius: 8px; padding: 16px; margin: 16px 0; }}
     h2 {{ margin-top: 0; }}
     pre {{ background: #f6f8fa; padding: 12px; overflow: auto; }}
+    @media (max-width: 1100px) {{ .viewer {{ grid-template-columns: 1fr; }} }}
   </style>
 </head>
 <body>
   <h1>{title} Review</h1>
   <div class="viewer">
-    <canvas id="motionCanvas" width="960" height="640"></canvas>
+    <div class="view-pane">
+      <h2>Skeleton</h2>
+      <canvas id="skeletonCanvas" width="720" height="640"></canvas>
+    </div>
+    <div class="view-pane">
+      <h2>G1 Robot</h2>
+      <canvas id="robotCanvas" width="720" height="640"></canvas>
+    </div>
     <div class="controls">
       <label>Candidate <select id="candidateSelect"></select></label>
       <button id="playButton">Play</button>
@@ -463,8 +473,10 @@ def write_review_gallery(
   {rows}
   <script>
     const DATA = {payload};
-    const canvas = document.getElementById("motionCanvas");
-    const ctx = canvas.getContext("2d");
+    const skeletonCanvas = document.getElementById("skeletonCanvas");
+    const skeletonCtx = skeletonCanvas.getContext("2d");
+    const robotCanvas = document.getElementById("robotCanvas");
+    const robotCtx = robotCanvas.getContext("2d");
     const select = document.getElementById("candidateSelect");
     const slider = document.getElementById("frameSlider");
     const playButton = document.getElementById("playButton");
@@ -475,7 +487,7 @@ def write_review_gallery(
     let playing = false;
 
     function current() {{ return DATA.motions[motionIndex]; }}
-    function project(point, bounds) {{
+    function project(point, bounds, canvas) {{
       const scale = Math.min(canvas.width, canvas.height) * 0.68 / Math.max(bounds.radius, 0.2);
       const x = point[0] - bounds.center[0];
       const y = point[1] - bounds.center[1];
@@ -485,45 +497,106 @@ def write_review_gallery(
         canvas.height * 0.62 - y * scale + z * 0.08 * scale,
       ];
     }}
-    function drawPoint(point, bounds, radius, color) {{
-      const p = project(point, bounds);
+    function drawPoint(ctx, canvas, point, bounds, radius, color) {{
+      const p = project(point, bounds, canvas);
       ctx.beginPath();
       ctx.arc(p[0], p[1], radius, 0, Math.PI * 2);
       ctx.fillStyle = color;
       ctx.fill();
     }}
-    function drawLabel(point, bounds, text, color) {{
-      const p = project(point, bounds);
+    function drawLabel(ctx, canvas, point, bounds, text, color) {{
+      const p = project(point, bounds, canvas);
       ctx.fillStyle = color;
       ctx.font = "13px system-ui, sans-serif";
       ctx.fillText(text, p[0] + 8, p[1] - 8);
     }}
-    function drawLine(a, b, bounds, color, width) {{
-      const pa = project(a, bounds);
-      const pb = project(b, bounds);
+    function drawLine(ctx, canvas, a, b, bounds, color, width) {{
+      const pa = project(a, bounds, canvas);
+      const pb = project(b, bounds, canvas);
       ctx.beginPath();
       ctx.moveTo(pa[0], pa[1]);
       ctx.lineTo(pb[0], pb[1]);
       ctx.lineWidth = width;
       ctx.strokeStyle = color;
+      ctx.lineCap = "round";
       ctx.stroke();
+    }}
+    function drawSceneReferences(ctx, canvas, m) {{
+      m.rowSpecs.forEach(row => drawLine(ctx, canvas, row.start_point, row.end_point, m.bounds, "#66d9ff", 3));
+      m.constraints.forEach(target => {{
+        const near = Math.abs(frame - target.frame) <= 2;
+        if (target.true_point) drawLine(ctx, canvas, target.true_point, target.position, m.bounds, near ? "#ffd27a" : "#8a7045", near ? 2 : 1);
+        if (target.wrist_point) drawLine(ctx, canvas, target.position, target.wrist_point, m.bounds, near ? "#d8a8ff" : "#7d5aa0", near ? 2 : 1);
+        drawPoint(ctx, canvas, target.position, m.bounds, near ? 7 : 4.5, near ? "#ff4f64" : "#cf4052");
+        if (target.true_point) drawPoint(ctx, canvas, target.true_point, m.bounds, near ? 5 : 3.5, "#46b9d9");
+        if (target.wrist_point) drawPoint(ctx, canvas, target.wrist_point, m.bounds, near ? 5 : 3.5, "#9e78ca");
+        if (near) drawLabel(ctx, canvas, target.position, m.bounds, target.label, "#ffb7c1");
+      }});
+    }}
+    function drawEmpty(ctx, canvas, label) {{
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      ctx.fillStyle = "#cbd5e1";
+      ctx.font = "16px system-ui, sans-serif";
+      ctx.fillText(label, 24, 36);
+    }}
+    function drawSkeletonView(m, pose) {{
+      skeletonCtx.clearRect(0, 0, skeletonCanvas.width, skeletonCanvas.height);
+      drawSceneReferences(skeletonCtx, skeletonCanvas, m);
+      m.edges.forEach(edge => drawLine(skeletonCtx, skeletonCanvas, pose[edge[0]], pose[edge[1]], m.bounds, "#86a9ff", 3));
+      pose.forEach(point => drawPoint(skeletonCtx, skeletonCanvas, point, m.bounds, 3.2, "#d7e2ff"));
+    }}
+    function drawRobotLink(ctx, canvas, pose, edge, bounds, width, color) {{
+      if (!pose[edge[0]] || !pose[edge[1]]) return;
+      drawLine(ctx, canvas, pose[edge[0]], pose[edge[1]], bounds, color, width);
+      drawPoint(ctx, canvas, pose[edge[0]], bounds, Math.max(width * 0.34, 3.5), color);
+      drawPoint(ctx, canvas, pose[edge[1]], bounds, Math.max(width * 0.28, 3.2), color);
+    }}
+    function drawRobotBadge(ctx, canvas, point, bounds, radius, color) {{
+      if (!point) return;
+      const p = project(point, bounds, canvas);
+      ctx.beginPath();
+      ctx.ellipse(p[0], p[1], radius * 0.72, radius, 0, 0, Math.PI * 2);
+      ctx.fillStyle = color;
+      ctx.fill();
+      ctx.lineWidth = 2;
+      ctx.strokeStyle = "#1f2937";
+      ctx.stroke();
+    }}
+    function drawRobotView(m, pose) {{
+      robotCtx.clearRect(0, 0, robotCanvas.width, robotCanvas.height);
+      drawSceneReferences(robotCtx, robotCanvas, m);
+      const legColor = "#9db5d6";
+      const armColor = "#d3dae6";
+      const bodyColor = "#eef2f7";
+      const darkColor = "#718096";
+      const links = [
+        [[0, 1], 17, bodyColor], [[0, 8], 17, bodyColor], [[0, 15], 19, bodyColor],
+        [[1, 2], 13, legColor], [[2, 3], 13, legColor], [[3, 4], 12, legColor], [[4, 5], 11, legColor], [[5, 6], 10, legColor], [[6, 7], 8, darkColor],
+        [[8, 9], 13, legColor], [[9, 10], 13, legColor], [[10, 11], 12, legColor], [[11, 12], 11, legColor], [[12, 13], 10, legColor], [[13, 14], 8, darkColor],
+        [[15, 16], 20, bodyColor], [[16, 17], 22, bodyColor],
+        [[17, 18], 12, armColor], [[18, 19], 11, armColor], [[19, 20], 10, armColor], [[20, 21], 9, armColor], [[21, 22], 8, armColor], [[22, 23], 7, armColor], [[23, 24], 6, armColor], [[24, 25], 6, darkColor],
+        [[17, 26], 12, armColor], [[26, 27], 11, armColor], [[27, 28], 10, armColor], [[28, 29], 9, armColor], [[29, 30], 8, armColor], [[30, 31], 7, armColor], [[31, 32], 6, armColor], [[32, 33], 6, darkColor],
+      ];
+      links.forEach(item => drawRobotLink(robotCtx, robotCanvas, pose, item[0], m.bounds, item[1], item[2]));
+      drawRobotBadge(robotCtx, robotCanvas, pose[0], m.bounds, 13, "#cbd5e1");
+      drawRobotBadge(robotCtx, robotCanvas, pose[17], m.bounds, 22, "#f8fafc");
+      if (pose[17]) {{
+        const head = [pose[17][0], pose[17][1] + 0.18, pose[17][2]];
+        drawRobotBadge(robotCtx, robotCanvas, head, m.bounds, 16, "#e2e8f0");
+      }}
+      drawRobotBadge(robotCtx, robotCanvas, pose[25], m.bounds, 9, "#b8c2cc");
+      drawRobotBadge(robotCtx, robotCanvas, pose[33], m.bounds, 9, "#b8c2cc");
     }}
     function draw() {{
       const m = current();
+      if (!m.frames.length) {{
+        drawEmpty(skeletonCtx, skeletonCanvas, "No skeleton frames in motion.npz");
+        drawEmpty(robotCtx, robotCanvas, "No G1 robot frames in motion.npz");
+        return;
+      }}
       const pose = m.frames[frame];
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
-      m.rowSpecs.forEach(row => drawLine(row.start_point, row.end_point, m.bounds, "#66d9ff", 3));
-      m.constraints.forEach(target => {{
-        const near = Math.abs(frame - target.frame) <= 2;
-        if (target.true_point) drawLine(target.true_point, target.position, m.bounds, near ? "#ffd27a" : "#8a7045", near ? 2 : 1);
-        if (target.wrist_point) drawLine(target.position, target.wrist_point, m.bounds, near ? "#d8a8ff" : "#7d5aa0", near ? 2 : 1);
-        drawPoint(target.position, m.bounds, near ? 7 : 4.5, near ? "#ff4f64" : "#cf4052");
-        if (target.true_point) drawPoint(target.true_point, m.bounds, near ? 5 : 3.5, "#46b9d9");
-        if (target.wrist_point) drawPoint(target.wrist_point, m.bounds, near ? 5 : 3.5, "#9e78ca");
-        if (near) drawLabel(target.position, m.bounds, target.label, "#ffb7c1");
-      }});
-      m.edges.forEach(edge => drawLine(pose[edge[0]], pose[edge[1]], m.bounds, "#86a9ff", 3));
-      pose.forEach(point => drawPoint(point, m.bounds, 3.2, "#d7e2ff"));
+      drawSkeletonView(m, pose);
+      drawRobotView(m, pose);
       frameLabel.textContent = `${{frame}} / ${{m.frames.length - 1}}`;
       slider.max = String(m.frames.length - 1);
       slider.value = String(frame);
