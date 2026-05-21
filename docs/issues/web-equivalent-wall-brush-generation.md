@@ -13,7 +13,7 @@ The goal is effect-level parity with the web UI: direct raw generation should fo
 ## Acceptance criteria
 
 - [ ] Add a named generation route for the wall-brush task equivalent to `demo_native_right_hand` / web-native End-Effectors construction.
-- [ ] Add or document a one-row wall-brush preset using the validated `left_arm_relaxed` prompt, `bias_compensated_flatB` targets, seed `7023`, `cfg_text=2.4`, `cfg_constraint=4.0`, `diffusion_steps=200`, and `num_transition_frames=3`.
+- [ ] Add or document a one-row wall-brush preset using the validated `left_arm_relaxed` prompt, brush-length-offset wall targets, seed `7023`, `cfg_text=2.4`, `cfg_constraint=4.0`, `diffusion_steps=200`, and `num_transition_frames=3`.
 - [ ] Ensure the generation path is raw KIMODO output only: no postprocess, no transition-aware smooth filter, no IK, no projection/optimization, and no candidate selection/reranking.
 - [ ] Include a repeatable command or script for running the one-row wall-brush case from the repo.
 - [ ] Save enough metadata with each generated motion to compare with web outputs later: prompts, segment lengths, seed, CFG weights, diffusion steps, constraint target points, active hand, and constraint route name.
@@ -31,3 +31,4 @@ None - can start immediately.
 - Observed web `test1.npz`: 178 frames, no saved seed metadata.
 - Current scripted preset: 102 frames unless explicitly probing longer timelines.
 - Both web and script-side native routes can follow the red constraint points with mean error around 2 cm; old `test1.npz` is not a deterministic equality baseline because its timeline/generation metadata is incomplete.
+- The earlier `bias_compensated_flatB` target set is invalid for first-stage building-motion experiments: it applied a wall/brush offset as a height and lateral compensation. Current recipes keep wall-contact `true_point` height unchanged and place the generated right-hand endpoint slightly closer to the body to represent brush length.

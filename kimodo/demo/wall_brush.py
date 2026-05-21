@@ -12,6 +12,24 @@ import torch
 from kimodo.constraints import RightHandConstraintSet
 
 
+WALL_BRUSH_LENGTH_M = 0.17
+WALL_BRUSH_WRIST_BACK_OFFSET_M = 0.08
+WALL_BRUSH_WRIST_DOWN_OFFSET_M = 0.015
+
+
+def _brush_handle_point(wall_point: list[float]) -> list[float]:
+    return [wall_point[0], wall_point[1], wall_point[2] - WALL_BRUSH_LENGTH_M]
+
+
+def _brush_wrist_point(wall_point: list[float]) -> list[float]:
+    handle = _brush_handle_point(wall_point)
+    return [
+        handle[0],
+        handle[1] - WALL_BRUSH_WRIST_DOWN_OFFSET_M,
+        handle[2] - WALL_BRUSH_WRIST_BACK_OFFSET_M,
+    ]
+
+
 WALL_BRUSH_ONE_ROW_PRESET: dict[str, Any] = {
     "name": "wall_brush_one_row_demo_native_right_hand_raw",
     "description": (
@@ -28,6 +46,15 @@ WALL_BRUSH_ONE_ROW_PRESET: dict[str, Any] = {
     "cfg_weight": [2.4, 4.0],
     "num_transition_frames": 3,
     "post_processing": False,
+    "geometry": {
+        "coordinate_system": "Y-up world coordinates in meters",
+        "wall_surface_z": 0.32,
+        "brush_length_m": WALL_BRUSH_LENGTH_M,
+        "generation_point_rule": (
+            "For wall-contact targets, true_point is the wall/brush-tip point and point is the right-hand "
+            "constraint point at the same x/y, shifted toward the body along -Z."
+        ),
+    },
     "prompts": [
         (
             "A person stands balanced in place in front of a small wall patch, keeps the left arm relaxed by the side, "
@@ -46,7 +73,7 @@ WALL_BRUSH_ONE_ROW_PRESET: dict[str, Any] = {
         {
             "label": "approach_1",
             "frame": 10,
-            "point": [-0.1745, 0.72, 0.295],
+            "point": _brush_handle_point([-0.155, 0.89, 0.295]),
             "true_point": [-0.155, 0.89, 0.295],
             "wrist_point": None,
             "use_wrist": False,
@@ -54,7 +81,7 @@ WALL_BRUSH_ONE_ROW_PRESET: dict[str, Any] = {
         {
             "label": "approach_2",
             "frame": 20,
-            "point": [-0.1308, 0.738, 0.312],
+            "point": _brush_handle_point([-0.132, 0.908, 0.312]),
             "true_point": [-0.132, 0.908, 0.312],
             "wrist_point": None,
             "use_wrist": False,
@@ -62,7 +89,7 @@ WALL_BRUSH_ONE_ROW_PRESET: dict[str, Any] = {
         {
             "label": "approach_final",
             "frame": 29,
-            "point": [-0.108, 0.75, 0.32],
+            "point": _brush_handle_point([-0.12, 0.92, 0.32]),
             "true_point": [-0.12, 0.92, 0.32],
             "wrist_point": None,
             "use_wrist": False,
@@ -70,15 +97,15 @@ WALL_BRUSH_ONE_ROW_PRESET: dict[str, Any] = {
         {
             "label": "row_1_point_1",
             "frame": 36,
-            "point": [-0.108, 0.75, 0.32],
+            "point": _brush_handle_point([-0.12, 0.92, 0.32]),
             "true_point": [-0.12, 0.92, 0.32],
-            "wrist_point": [-0.108, 0.735, 0.24],
+            "wrist_point": _brush_wrist_point([-0.12, 0.92, 0.32]),
             "use_wrist": True,
         },
         {
             "label": "row_1_point_2",
             "frame": 42,
-            "point": [-0.0168, 0.75, 0.32],
+            "point": _brush_handle_point([-0.072, 0.92, 0.32]),
             "true_point": [-0.072, 0.92, 0.32],
             "wrist_point": None,
             "use_wrist": False,
@@ -86,7 +113,7 @@ WALL_BRUSH_ONE_ROW_PRESET: dict[str, Any] = {
         {
             "label": "row_1_point_3",
             "frame": 48,
-            "point": [0.0744, 0.75, 0.32],
+            "point": _brush_handle_point([-0.024, 0.92, 0.32]),
             "true_point": [-0.024, 0.92, 0.32],
             "wrist_point": None,
             "use_wrist": False,
@@ -94,7 +121,7 @@ WALL_BRUSH_ONE_ROW_PRESET: dict[str, Any] = {
         {
             "label": "row_1_point_4",
             "frame": 54,
-            "point": [0.1656, 0.75, 0.32],
+            "point": _brush_handle_point([0.024, 0.92, 0.32]),
             "true_point": [0.024, 0.92, 0.32],
             "wrist_point": None,
             "use_wrist": False,
@@ -102,7 +129,7 @@ WALL_BRUSH_ONE_ROW_PRESET: dict[str, Any] = {
         {
             "label": "row_1_point_5",
             "frame": 60,
-            "point": [0.2568, 0.75, 0.32],
+            "point": _brush_handle_point([0.072, 0.92, 0.32]),
             "true_point": [0.072, 0.92, 0.32],
             "wrist_point": None,
             "use_wrist": False,
@@ -110,9 +137,9 @@ WALL_BRUSH_ONE_ROW_PRESET: dict[str, Any] = {
         {
             "label": "row_1_point_6",
             "frame": 66,
-            "point": [0.348, 0.75, 0.32],
+            "point": _brush_handle_point([0.12, 0.92, 0.32]),
             "true_point": [0.12, 0.92, 0.32],
-            "wrist_point": [0.348, 0.735, 0.24],
+            "wrist_point": _brush_wrist_point([0.12, 0.92, 0.32]),
             "use_wrist": True,
         },
         {

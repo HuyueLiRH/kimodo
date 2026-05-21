@@ -120,6 +120,14 @@ class PriorTaskSpecValidationTests(unittest.TestCase):
         self.assertEqual(len(spec.candidates[0].constraints), 10)
         self.assertTrue(all(point.used_for_generation for point in spec.candidates[0].constraints))
 
+        stroke_points = [point for point in spec.candidates[0].constraints if point.role == "brush_stroke_point"]
+        self.assertEqual(len(stroke_points), 6)
+        for point in stroke_points:
+            self.assertIsNotNone(point.true_point)
+            self.assertAlmostEqual(point.position[0], point.true_point[0])
+            self.assertAlmostEqual(point.position[1], point.true_point[1])
+            self.assertAlmostEqual(point.position[2], point.true_point[2] - 0.17)
+
 
 if __name__ == "__main__":
     unittest.main()
