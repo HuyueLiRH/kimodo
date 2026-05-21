@@ -13,21 +13,10 @@ from kimodo.constraints import RightHandConstraintSet
 
 
 WALL_BRUSH_LENGTH_M = 0.17
-WALL_BRUSH_WRIST_BACK_OFFSET_M = 0.08
-WALL_BRUSH_WRIST_DOWN_OFFSET_M = 0.015
 
 
 def _brush_handle_point(wall_point: list[float]) -> list[float]:
     return [wall_point[0], wall_point[1], wall_point[2] - WALL_BRUSH_LENGTH_M]
-
-
-def _brush_wrist_point(wall_point: list[float]) -> list[float]:
-    handle = _brush_handle_point(wall_point)
-    return [
-        handle[0],
-        handle[1] - WALL_BRUSH_WRIST_DOWN_OFFSET_M,
-        handle[2] - WALL_BRUSH_WRIST_BACK_OFFSET_M,
-    ]
 
 
 WALL_BRUSH_ONE_ROW_PRESET: dict[str, Any] = {
@@ -48,11 +37,12 @@ WALL_BRUSH_ONE_ROW_PRESET: dict[str, Any] = {
     "post_processing": False,
     "geometry": {
         "coordinate_system": "Y-up world coordinates in meters",
-        "wall_surface_z": 0.32,
+        "wall_surface_z": 0.45,
         "brush_length_m": WALL_BRUSH_LENGTH_M,
         "generation_point_rule": (
-            "For wall-contact targets, true_point is the wall/brush-tip point and point is the right-hand "
-            "constraint point at the same x/y, shifted toward the body along -Z."
+            "Use only start/mid/end wall-contact anchors for first-stage raw generation. true_point is the "
+            "wall/brush-tip point and point is the right-hand constraint point at the same x/y, shifted toward "
+            "the body along -Z."
         ),
     },
     "prompts": [
@@ -71,82 +61,26 @@ WALL_BRUSH_ONE_ROW_PRESET: dict[str, Any] = {
     ],
     "right_hand_targets": [
         {
-            "label": "approach_1",
-            "frame": 10,
-            "point": _brush_handle_point([-0.155, 0.89, 0.295]),
-            "true_point": [-0.155, 0.89, 0.295],
-            "wrist_point": None,
-            "use_wrist": False,
-        },
-        {
-            "label": "approach_2",
-            "frame": 20,
-            "point": _brush_handle_point([-0.132, 0.908, 0.312]),
-            "true_point": [-0.132, 0.908, 0.312],
-            "wrist_point": None,
-            "use_wrist": False,
-        },
-        {
-            "label": "approach_final",
-            "frame": 29,
-            "point": _brush_handle_point([-0.12, 0.92, 0.32]),
-            "true_point": [-0.12, 0.92, 0.32],
-            "wrist_point": None,
-            "use_wrist": False,
-        },
-        {
-            "label": "row_1_point_1",
+            "label": "row_1_start",
             "frame": 36,
-            "point": _brush_handle_point([-0.12, 0.92, 0.32]),
-            "true_point": [-0.12, 0.92, 0.32],
-            "wrist_point": _brush_wrist_point([-0.12, 0.92, 0.32]),
-            "use_wrist": True,
-        },
-        {
-            "label": "row_1_point_2",
-            "frame": 42,
-            "point": _brush_handle_point([-0.072, 0.92, 0.32]),
-            "true_point": [-0.072, 0.92, 0.32],
+            "point": _brush_handle_point([-0.12, 0.92, 0.45]),
+            "true_point": [-0.12, 0.92, 0.45],
             "wrist_point": None,
             "use_wrist": False,
         },
         {
-            "label": "row_1_point_3",
-            "frame": 48,
-            "point": _brush_handle_point([-0.024, 0.92, 0.32]),
-            "true_point": [-0.024, 0.92, 0.32],
+            "label": "row_1_mid",
+            "frame": 51,
+            "point": _brush_handle_point([0.0, 0.92, 0.45]),
+            "true_point": [0.0, 0.92, 0.45],
             "wrist_point": None,
             "use_wrist": False,
         },
         {
-            "label": "row_1_point_4",
-            "frame": 54,
-            "point": _brush_handle_point([0.024, 0.92, 0.32]),
-            "true_point": [0.024, 0.92, 0.32],
-            "wrist_point": None,
-            "use_wrist": False,
-        },
-        {
-            "label": "row_1_point_5",
-            "frame": 60,
-            "point": _brush_handle_point([0.072, 0.92, 0.32]),
-            "true_point": [0.072, 0.92, 0.32],
-            "wrist_point": None,
-            "use_wrist": False,
-        },
-        {
-            "label": "row_1_point_6",
+            "label": "row_1_end",
             "frame": 66,
-            "point": _brush_handle_point([0.12, 0.92, 0.32]),
-            "true_point": [0.12, 0.92, 0.32],
-            "wrist_point": _brush_wrist_point([0.12, 0.92, 0.32]),
-            "use_wrist": True,
-        },
-        {
-            "label": "return_final",
-            "frame": 101,
-            "point": [-0.14633791, 0.86423099, 0.29977581],
-            "true_point": [-0.14633791, 0.86423099, 0.29977581],
+            "point": _brush_handle_point([0.12, 0.92, 0.45]),
+            "true_point": [0.12, 0.92, 0.45],
             "wrist_point": None,
             "use_wrist": False,
         },

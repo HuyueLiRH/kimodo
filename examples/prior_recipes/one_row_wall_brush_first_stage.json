@@ -4,134 +4,46 @@
   "duration_frames": 102,
   "geometry": {
     "coordinate_system": "Y-up world coordinates in meters",
-    "wall_surface_z": 0.32,
+    "wall_surface_z": 0.45,
     "brush_length_m": 0.17,
-    "generation_point_rule": "For wall-contact targets, true_point is the wall/brush-tip point and position is the right-hand constraint point at the same x/y, shifted toward the body by brush_length_m along -Z."
+    "generation_point_rule": "Use only start/mid/end wall-contact anchors for first-stage raw generation. true_point is the wall/brush-tip point and position is the right-hand constraint point at the same x/y, shifted toward the body by brush_length_m along -Z."
   },
   "constraints": [
     {
-      "label": "approach_1",
-      "end_effector": "right-hand",
-      "frame": 10,
-      "position": [-0.155, 0.89, 0.125],
-      "true_point": [-0.155, 0.89, 0.295],
-      "coordinate_frame": "world",
-      "used_for_generation": true,
-      "show_in_review": true,
-      "used_for_postprocess": true,
-      "role": "approach"
-    },
-    {
-      "label": "approach_2",
-      "end_effector": "right-hand",
-      "frame": 20,
-      "position": [-0.132, 0.908, 0.142],
-      "true_point": [-0.132, 0.908, 0.312],
-      "coordinate_frame": "world",
-      "used_for_generation": true,
-      "show_in_review": true,
-      "used_for_postprocess": true,
-      "role": "approach"
-    },
-    {
-      "label": "approach_final",
-      "end_effector": "right-hand",
-      "frame": 29,
-      "position": [-0.12, 0.92, 0.15],
-      "true_point": [-0.12, 0.92, 0.32],
-      "coordinate_frame": "world",
-      "used_for_generation": true,
-      "show_in_review": true,
-      "used_for_postprocess": true,
-      "role": "brush_line_start"
-    },
-    {
-      "label": "row_1_point_1",
+      "label": "row_1_start",
       "end_effector": "right-hand",
       "frame": 36,
-      "position": [-0.12, 0.92, 0.15],
-      "true_point": [-0.12, 0.92, 0.32],
-      "wrist_point": [-0.12, 0.905, 0.07],
-      "use_wrist": true,
+      "position": [-0.12, 0.92, 0.28],
+      "true_point": [-0.12, 0.92, 0.45],
       "coordinate_frame": "world",
       "used_for_generation": true,
       "show_in_review": true,
       "used_for_postprocess": true,
-      "role": "brush_stroke_point"
+      "role": "brush_stroke_start"
     },
     {
-      "label": "row_1_point_2",
+      "label": "row_1_mid",
       "end_effector": "right-hand",
-      "frame": 42,
-      "position": [-0.072, 0.92, 0.15],
-      "true_point": [-0.072, 0.92, 0.32],
+      "frame": 51,
+      "position": [0.0, 0.92, 0.28],
+      "true_point": [0.0, 0.92, 0.45],
       "coordinate_frame": "world",
       "used_for_generation": true,
       "show_in_review": true,
       "used_for_postprocess": true,
-      "role": "brush_stroke_point"
+      "role": "brush_stroke_mid"
     },
     {
-      "label": "row_1_point_3",
-      "end_effector": "right-hand",
-      "frame": 48,
-      "position": [-0.024, 0.92, 0.15],
-      "true_point": [-0.024, 0.92, 0.32],
-      "coordinate_frame": "world",
-      "used_for_generation": true,
-      "show_in_review": true,
-      "used_for_postprocess": true,
-      "role": "brush_stroke_point"
-    },
-    {
-      "label": "row_1_point_4",
-      "end_effector": "right-hand",
-      "frame": 54,
-      "position": [0.024, 0.92, 0.15],
-      "true_point": [0.024, 0.92, 0.32],
-      "coordinate_frame": "world",
-      "used_for_generation": true,
-      "show_in_review": true,
-      "used_for_postprocess": true,
-      "role": "brush_stroke_point"
-    },
-    {
-      "label": "row_1_point_5",
-      "end_effector": "right-hand",
-      "frame": 60,
-      "position": [0.072, 0.92, 0.15],
-      "true_point": [0.072, 0.92, 0.32],
-      "coordinate_frame": "world",
-      "used_for_generation": true,
-      "show_in_review": true,
-      "used_for_postprocess": true,
-      "role": "brush_stroke_point"
-    },
-    {
-      "label": "row_1_point_6",
+      "label": "row_1_end",
       "end_effector": "right-hand",
       "frame": 66,
-      "position": [0.12, 0.92, 0.15],
-      "true_point": [0.12, 0.92, 0.32],
-      "wrist_point": [0.12, 0.905, 0.07],
-      "use_wrist": true,
+      "position": [0.12, 0.92, 0.28],
+      "true_point": [0.12, 0.92, 0.45],
       "coordinate_frame": "world",
       "used_for_generation": true,
       "show_in_review": true,
       "used_for_postprocess": true,
-      "role": "brush_stroke_point"
-    },
-    {
-      "label": "return_final",
-      "end_effector": "right-hand",
-      "frame": 101,
-      "position": [-0.14633791, 0.86423099, 0.29977581],
-      "true_point": [-0.14633791, 0.86423099, 0.29977581],
-      "coordinate_frame": "world",
-      "used_for_generation": true,
-      "show_in_review": true,
-      "used_for_postprocess": false,
-      "role": "natural_stop"
+      "role": "brush_stroke_end"
     }
   ],
   "candidates": [

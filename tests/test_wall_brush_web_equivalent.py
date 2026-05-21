@@ -54,14 +54,17 @@ class WallBrushWebEquivalentTests(unittest.TestCase):
         self.assertEqual(WALL_BRUSH_ONE_ROW_PRESET["num_denoising_steps"], 200)
         self.assertEqual(WALL_BRUSH_ONE_ROW_PRESET["num_transition_frames"], 3)
         self.assertFalse(WALL_BRUSH_ONE_ROW_PRESET["post_processing"])
-        self.assertEqual(len(WALL_BRUSH_ONE_ROW_PRESET["right_hand_targets"]), 10)
+        self.assertEqual(len(WALL_BRUSH_ONE_ROW_PRESET["right_hand_targets"]), 3)
         stroke_targets = [
             target for target in WALL_BRUSH_ONE_ROW_PRESET["right_hand_targets"] if target["label"].startswith("row_1")
         ]
+        self.assertEqual([target["label"] for target in stroke_targets], ["row_1_start", "row_1_mid", "row_1_end"])
+        self.assertEqual([target["frame"] for target in stroke_targets], [36, 51, 66])
         for target in stroke_targets:
             self.assertEqual(target["point"][0], target["true_point"][0])
             self.assertEqual(target["point"][1], target["true_point"][1])
             self.assertAlmostEqual(target["point"][2], target["true_point"][2] - 0.17)
+            self.assertEqual(target["true_point"][2], 0.45)
 
     def test_build_generation_kwargs_are_raw_and_reproducible(self):
         from kimodo.demo.wall_brush import build_wall_brush_generation_kwargs
@@ -133,7 +136,7 @@ class WallBrushWebEquivalentTests(unittest.TestCase):
         self.assertEqual(spec.segments, [30, 42, 30])
         self.assertFalse(spec.post_processing)
         self.assertEqual(spec.end_effector.type, "right-hand")
-        self.assertEqual(len(spec.end_effector.targets), 10)
+        self.assertEqual(len(spec.end_effector.targets), 3)
 
 
 if __name__ == "__main__":

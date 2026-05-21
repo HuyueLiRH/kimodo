@@ -16,7 +16,7 @@ Each candidate uses native multi-prompt generation for one continuous action:
 
 The declared right-hand constraint points are passed to KIMODO generation by default and should also be shown in review. Postprocessing is intentionally off by default; any postprocessed version should be recorded as a derived motion with raw-to-postprocessed lineage.
 
-Wall-contact geometry is explicit in the recipe. `true_point` is the wall surface / brush-tip point. `position` is the right-hand endpoint passed to KIMODO; for wall-contact points it keeps the same horizontal coordinate and height as `true_point`, then shifts `0.17 m` toward the body along `-Z` to account for brush length. This avoids the earlier invalid calibration where the offset was accidentally applied to height.
+Wall-contact geometry is explicit in the recipe. The first-stage raw recipe uses only three sparse wall-contact anchors: start, middle, and end of the desired brush row. `true_point` is the wall surface / brush-tip point at `z=0.45`. `position` is the right-hand endpoint passed to KIMODO; it keeps the same horizontal coordinate and height as `true_point`, then shifts `0.17 m` toward the body along `-Z` to account for brush length. This avoids the earlier invalid calibration where the offset was accidentally applied to height and too many dense points overconstrained generation.
 
 Run on the remote server with:
 

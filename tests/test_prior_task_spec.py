@@ -117,16 +117,20 @@ class PriorTaskSpecValidationTests(unittest.TestCase):
             "seed_upright_style",
         ])
         self.assertEqual(spec.candidates[0].segments, [30, 42, 30])
-        self.assertEqual(len(spec.candidates[0].constraints), 10)
+        self.assertEqual(len(spec.candidates[0].constraints), 3)
         self.assertTrue(all(point.used_for_generation for point in spec.candidates[0].constraints))
 
-        stroke_points = [point for point in spec.candidates[0].constraints if point.role == "brush_stroke_point"]
-        self.assertEqual(len(stroke_points), 6)
+        stroke_points = [
+            point for point in spec.candidates[0].constraints if (point.role or "").startswith("brush_stroke")
+        ]
+        self.assertEqual([point.label for point in stroke_points], ["row_1_start", "row_1_mid", "row_1_end"])
+        self.assertEqual([point.frame for point in stroke_points], [36, 51, 66])
         for point in stroke_points:
             self.assertIsNotNone(point.true_point)
             self.assertAlmostEqual(point.position[0], point.true_point[0])
             self.assertAlmostEqual(point.position[1], point.true_point[1])
             self.assertAlmostEqual(point.position[2], point.true_point[2] - 0.17)
+            self.assertAlmostEqual(point.true_point[2], 0.45)
 
 
 if __name__ == "__main__":
