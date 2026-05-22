@@ -15,6 +15,8 @@ import numpy as np
 CONSTRAINT_MARKER_RADIUS = 0.012
 CONSTRAINT_LABEL_OFFSET = np.array([0.0, 0.035, 0.0], dtype=np.float64)
 TARGET_LINE_WIDTH = 2.0
+HAND_PATH_LINE_WIDTH = 3.0
+RIGHT_HAND_JOINT_INDEX_G1 = 33
 
 
 @dataclass(frozen=True)
@@ -122,6 +124,7 @@ class PriorViewerApp:
             "show_constraints": True,
             "show_constraint_labels": False,
             "show_targets": True,
+            "show_hand_path": True,
         }
         self._client_state[client.client_id] = state
         self._create_gui(client, state)
@@ -191,6 +194,7 @@ class PriorViewerApp:
             constraints_checkbox = client.gui.add_checkbox("Show Constraint Points", initial_value=True)
             constraint_labels_checkbox = client.gui.add_checkbox("Show Constraint Labels", initial_value=False)
             target_checkbox = client.gui.add_checkbox("Show Target Lines", initial_value=True)
+            hand_path_checkbox = client.gui.add_checkbox("Show Actual Right Hand Path", initial_value=True)
 
         state["gui"] = {
             "candidate": candidate_dropdown,
@@ -203,6 +207,7 @@ class PriorViewerApp:
             "constraints": constraints_checkbox,
             "constraint_labels": constraint_labels_checkbox,
             "targets": target_checkbox,
+            "hand_path": hand_path_checkbox,
         }
 
         @candidate_dropdown.on_update
@@ -278,6 +283,11 @@ class PriorViewerApp:
             state["show_targets"] = target_checkbox.value
             self._set_overlay_visibility(state)
 
+        @hand_path_checkbox.on_update
+        def _hand_path_changed(_event: Any) -> None:
+            state["show_hand_path"] = hand_path_checkbox.value
+            self._set_overlay_visibility(state)
+
         if hasattr(client, "timeline"):
             @client.timeline.on_frame_change
             def _timeline_frame_changed(frame_idx: int) -> None:
@@ -310,7 +320,7 @@ class PriorViewerApp:
         state["frame"] = 0
         state["fps"] = 30.0
         self._setup_timeline(state, motion.length)
-        self._add_overlays(state, candidate)
+        self._add_overlays(state, candidate, joints_pos.detach().cpu().numpy())
         self._set_frame(state, 0, update_timeline=True)
 
     def _setup_timeline(self, state: dict[str, Any], frame_count: int) -> None:
@@ -336,7 +346,12 @@ class PriorViewerApp:
             )
         client.timeline.set_current_frame(0)
 
-    def _add_overlays(self, state: dict[str, Any], candidate: PriorViewerCandidate) -> None:
+    def _add_overlays(
+        self,
+        state: dict[str, Any],
+        candidate: PriorViewerCandidate,
+        joints_pos: np.ndarray,
+    ) -> None:
         client = state["client"]
         overlays = []
         visible_constraints = state.get("show_constraints", True)
@@ -373,6 +388,16 @@ class PriorViewerApp:
             )
             line.visible = state.get("show_targets", True)
             overlays.append(("target", line))
+        hand_path = _right_hand_path_segments(candidate.constraints, joints_pos)
+        if hand_path:
+            line = client.scene.add_line_segments(
+                name="/prior_targets/actual_right_hand_path",
+                points=np.asarray(hand_path, dtype=np.float64),
+                colors=(255, 176, 0),
+                line_width=HAND_PATH_LINE_WIDTH,
+            )
+            line.visible = state.get("show_hand_path", True)
+            overlays.append(("hand_path", line))
         state["overlays"] = overlays
 
     def _set_overlay_visibility(self, state: dict[str, Any]) -> None:
@@ -540,6 +565,8 @@ def _overlay_visible(kind: str, state: dict[str, Any]) -> bool:
         return state.get("show_constraints", True)
     if kind == "constraint_label":
         return state.get("show_constraints", True) and state.get("show_constraint_labels", False)
+    if kind == "hand_path":
+        return state.get("show_hand_path", True)
     return state.get("show_targets", True)
 
 
@@ -563,6 +590,27 @@ def _target_line_segments(constraints: list[dict[str, Any]]) -> list[list[list[f
     start = stroke[0].get("true_point") or stroke[0]["position"]
     end = stroke[-1].get("true_point") or stroke[-1]["position"]
     return [[start, end]]
+
+
+def _right_hand_path_segments(
+    constraints: list[dict[str, Any]],
+    joints_pos: np.ndarray,
+) -> list[list[list[float]]]:
+    if joints_pos.ndim != 3 or joints_pos.shape[1] <= RIGHT_HAND_JOINT_INDEX_G1:
+        return []
+    stroke = [
+        constraint
+        for constraint in constraints
+        if "row_" in constraint.get("label", "") or "brush_stroke" in str(constraint.get("role", ""))
+    ]
+    if len(stroke) < 2:
+        return []
+    start = max(0, min(int(item.get("frame", 0)) for item in stroke))
+    end = min(joints_pos.shape[0] - 1, max(int(item.get("frame", 0)) for item in stroke))
+    if end <= start:
+        return []
+    hand = joints_pos[start : end + 1, RIGHT_HAND_JOINT_INDEX_G1]
+    return [[hand[i].tolist(), hand[i + 1].tolist()] for i in range(len(hand) - 1)]
 
 
 def _prompt_markdown(prompt_segments: list[dict[str, Any]]) -> str:
