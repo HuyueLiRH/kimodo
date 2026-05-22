@@ -1,0 +1,181 @@
+{
+  "schema_version": 1,
+  "status": "accepted_generalized_experiment_setting",
+  "date_accepted": "2026-05-21",
+  "date_generalized": "2026-05-22",
+  "task": "one_row_wall_brush",
+  "model": "kimodo-g1-rp",
+  "baseline_candidate": "y0p92_x0p00_w0p24",
+  "accepted_variant": "right_arm_g1_hinge_line_refit_smooth_body_default_return_no_taper",
+  "raw_generation": {
+    "prompt_strategy": "current_best_outside_surface_single_prompt",
+    "prompt_segments": [
+      {
+        "label": "whole_motion",
+        "text": "A person stands still and slides the right palm flat on the outside surface of a wall from left to right.",
+        "start_frame": 0,
+        "end_frame": 101,
+        "segment_source": "current_best_wall_brush_pipeline"
+      }
+    ],
+    "seed": 7023,
+    "duration_frames": 102,
+    "constraints": [
+      {
+        "label": "row_1_start",
+        "end_effector": "right-hand",
+        "frame": 36,
+        "position": [-0.12, 0.92, 0.28],
+        "true_point": [-0.12, 0.92, 0.45],
+        "coordinate_frame": "world",
+        "role": "brush_stroke_start",
+        "used_for_generation": true,
+        "show_in_review": true,
+        "used_for_postprocess": true
+      },
+      {
+        "label": "row_1_mid",
+        "end_effector": "right-hand",
+        "frame": 51,
+        "position": [0.0, 0.92, 0.28],
+        "true_point": [0.0, 0.92, 0.45],
+        "coordinate_frame": "world",
+        "role": "brush_stroke_mid",
+        "used_for_generation": true,
+        "show_in_review": true,
+        "used_for_postprocess": true
+      },
+      {
+        "label": "row_1_end",
+        "end_effector": "right-hand",
+        "frame": 66,
+        "position": [0.12, 0.92, 0.28],
+        "true_point": [0.12, 0.92, 0.45],
+        "coordinate_frame": "world",
+        "role": "brush_stroke_end",
+        "used_for_generation": true,
+        "show_in_review": true,
+        "used_for_postprocess": true
+      }
+    ],
+    "geometry": {
+      "coordinate_system": "Y-up world coordinates in meters",
+      "wall_surface_z": 0.45,
+      "brush_length_m": 0.17,
+      "constraint_z": 0.28,
+      "generation_point_rule": "The wall/brush-tip point keeps the desired wall surface z. The KIMODO right-hand constraint point is shifted toward the body along -Z by brush_length_m."
+    }
+  },
+  "postprocessing": {
+    "lineage": [
+      "raw",
+      "right_arm_fabrik_fk_refit_lightlock_smooth_return_initial_slow",
+      "right_arm_line_lock_after_smooth_target",
+      "right_arm_g1_hinge_line_refit_smooth",
+      "right_arm_g1_hinge_line_refit_smooth_body_default_return_target",
+      "right_arm_g1_hinge_line_refit_smooth_body_default_return_no_taper"
+    ],
+    "method": "G1_RIGHT_ARM_HINGE_DOF_TARGET_REFIT",
+    "target_construction": {
+      "stroke_frames": [36, 51, 66],
+      "stroke_target": "straight right-hand line through the three declared brush-stroke constraints",
+      "return_frames": [67, 101],
+      "return_curve": "smootherstep in G1 right-arm hinge angle space",
+      "default_return": "frame-0 physical right-arm hinge angles replayed relative to the current body/root",
+      "disable_final_taper_reason": "The final frame is part of the return target. End taper weakens frame 101 and allows drift toward the old bad final pose."
+    },
+    "optimizer": {
+      "opt_joints": [26, 27, 28, 29, 30, 31, 32],
+      "opt_hinge_indices": [22, 23, 24, 25, 26, 27, 28],
+      "exclude_joints": [33],
+      "steps": 1400,
+      "lr": 0.012,
+      "pad": 4,
+      "threshold": 0.0001,
+      "taper_frames": 0,
+      "fps": 30.0,
+      "target_loss_weight": 700.0,
+      "hand_loss_weight": 16000.0,
+      "pose_prior_weight": 4.0,
+      "angle_prior_weight": 8.0,
+      "angle_vel_weight": 180.0,
+      "angle_acc_weight": 320.0,
+      "hand_acc_weight": 4500.0
+    }
+  },
+  "acceptance_metrics": {
+    "constraint_key_error": {
+      "mean_m": 0.001766750870545895,
+      "max_m": 0.0031957540095281217,
+      "per_point_m": {
+        "row_1_start": 0.0018354810323403736,
+        "row_1_mid": 0.00026901756976918987,
+        "row_1_end": 0.0031957540095281217
+      }
+    },
+    "line_distance": {
+      "mean_m": 0.00017026789465052363,
+      "max_m": 0.0012690797485364947
+    },
+    "target_hand_error": {
+      "mean_m": 0.0008715596053138413,
+      "max_m": 0.0031954622055716544
+    },
+    "default_return": {
+      "final_hand_distance_to_body_default_target_m": 0.0022965692915022373,
+      "final_hand_distance_to_previous_bad_final_m": 0.28010499477386475,
+      "return_step_mean_m": 0.013633159920573235,
+      "return_step_max_m": 0.02636049874126911,
+      "return_step_max_frame": 84
+    }
+  },
+  "artifact_references": {
+    "local_review_run": "logs/wall_brush_line_lock_after_smooth_baseline_20260521",
+    "accepted_motion": "postprocessed/y0p92_x0p00_w0p24/right_arm_g1_hinge_line_refit_smooth_body_default_return_no_taper/motion.npz",
+    "accepted_report": "postprocessed/y0p92_x0p00_w0p24/right_arm_g1_hinge_line_refit_smooth_body_default_return_no_taper/report.json",
+    "generalization_review_run": "logs/wall_brush_generalization_27_smooth_return_20260521",
+    "generalization_summary_csv": "g1_hinge_default_return_summary.csv",
+    "generalization_summary_json": "g1_hinge_default_return_summary.json"
+  },
+  "generalization_metrics": {
+    "run_date": "2026-05-22",
+    "run_folder": "logs/wall_brush_generalization_27_smooth_return_20260521",
+    "processed_count": 27,
+    "threshold_counts": {
+      "constraint_max_le_0p005_m": 11,
+      "constraint_max_le_0p010_m": 21,
+      "constraint_max_le_0p015_m": 24,
+      "constraint_max_le_0p020_m": 26
+    },
+    "worst_values": {
+      "line_max_m": 0.00843156773477459,
+      "final_hand_distance_to_body_default_target_m": 0.0029571345075964928,
+      "return_max_step_m": 0.034470152109861374
+    },
+    "highest_error_samples": [
+      {
+        "variant": "y0p86_x0p08_w0p30",
+        "constraint_max_m": 0.022642242106915966,
+        "line_max_m": 0.008056692447962236,
+        "note": "right-shifted wide stroke; likely near G1 right-arm reach/naturalness boundary"
+      },
+      {
+        "variant": "y0p92_x0p08_w0p30",
+        "constraint_max_m": 0.016223283066917258,
+        "line_max_m": 0.00692126792575984,
+        "note": "right-shifted wide stroke"
+      },
+      {
+        "variant": "y0p98_x0p08_w0p30",
+        "constraint_max_m": 0.015159672678057418,
+        "line_max_m": 0.00843156773477459,
+        "note": "high, right-shifted wide stroke"
+      }
+    ]
+  },
+  "next_steps": [
+    "Visually inspect the right-shifted wide-stroke edge cases from the 27-position set.",
+    "If the return is visually too fast for some positions, standardize a longer final frame count such as 120 frames.",
+    "Wire this documented setting into an executable repo postprocessing treatment before using it as the default batch pipeline."
+  ]
+}

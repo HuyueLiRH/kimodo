@@ -244,6 +244,14 @@ _Avoid_: Rejecting a semantically clean motion only because wall contact is not 
 The stable G1 starting state used for prior generation. It should match the posture of the real G1 robot when it enters debug mode, so generated motions do not begin with a discontinuous jump or sudden correction.
 _Avoid_: Constraint-calibration pose only, arbitrary generated first frame, visually convenient pose that does not match G1 debug mode.
 
+**G1 Hinge-Space Postprocess**:
+A **Postprocessing Treatment** that optimizes only the legal physical G1 hinge degrees of freedom for the edited limb, rather than arbitrary local SO(3) rotations on skeleton joints.
+_Avoid_: A visually straight end-effector path that is achieved by impossible upper-arm, elbow, or wrist rotations.
+
+**Body-Relative Default Return**:
+A return target that brings a limb back to its frame-0 default hinge posture relative to the robot's current body/root pose, instead of forcing the end effector back to its absolute world-space frame-0 point.
+_Avoid_: World-space return targets that conflict with root/body drift, or end-tapered returns that fail to reach the final default pose.
+
 ## Relationships
 
 - The **Building Motion Generation Project** produces a **Motion Prior Collection**.
@@ -289,6 +297,8 @@ _Avoid_: Constraint-calibration pose only, arbitrary generated first frame, visu
 - First-stage review decisions should use **File-Based Review State**.
 - **Diagnostic Metrics** support review, but the **Prior Admission Standard** remains the final admission authority.
 - A **Building Motion Prior** should begin from the **Canonical Start Motion** when the expected deployment setup uses that stable start.
+- Accepted G1 postprocessed priors should prefer **G1 Hinge-Space Postprocess** over arbitrary SO(3) refits when physical robot plausibility matters.
+- Wall-brushing postprocess may use **Body-Relative Default Return** so the robot finishes in the stable default/debug arm posture even when the body/root has moved during the motion.
 - A **G1-RP Motion Experiment** produces one or more **Raw Base Motions**.
 - A **Web-Equivalent Generation Path** is acceptable when the generated motion quality matches the web UI for the same task, even if the output is not numerically identical.
 - The **Legacy Wall-Brush Script** should be removed from the supported first-stage generation path.
@@ -435,6 +445,12 @@ _Avoid_: Constraint-calibration pose only, arbitrary generated first frame, visu
 
 > **Dev:** "Is the web UI start only used to calibrate constraints?"
 > **Domain expert:** "No. The **Canonical Start Motion** should match the real G1 debug-mode posture so generated priors start without a sudden movement."
+
+> **Dev:** "Can we make the hand follow a perfect line by directly moving skeleton joints?"
+> **Domain expert:** "Only if the result remains physically plausible. For G1, prefer a **G1 Hinge-Space Postprocess** so the right arm stays inside the robot's legal hinge freedoms."
+
+> **Dev:** "Should the right hand return to the absolute world coordinate from frame 0?"
+> **Domain expert:** "No. Use **Body-Relative Default Return** when the goal is to end in the robot's default/debug arm posture after body/root movement."
 
 > **Dev:** "This sample misses the exact wall constraint by a few centimeters. Should we reject it?"
 > **Domain expert:** "Not automatically. If it satisfies the **Prior Admission Standard**, it can still become a **Building Motion Prior** because postprocessing or RL may handle the remaining precision."

@@ -31,3 +31,16 @@ kimodo_prior_run \
 After generation, sync the lightweight review artifacts, including `.npz` motions, manifest, metrics, review state, recipes, and gallery, to a local review folder before visual inspection.
 
 The first review goal is Semantic Task Success: clean one-row brushing behavior with no start jump, turn-around, unrelated arm waving, excessive body drift, or unrelated motion after the task is complete. Small contact or line-tracking offsets are Contact Precision Debt, not automatic rejection.
+
+## Current Accepted Postprocessed Candidate
+
+The current accepted postprocessed pipeline for the baseline single-row sample is documented in
+[`one_row_wall_brush_g1_hinge_default_return.md`](one_row_wall_brush_g1_hinge_default_return.md).
+
+This is not raw KIMODO output. It is a postprocessed prior candidate that keeps raw-to-postprocessed
+lineage and should be treated as the current best wall-brushing cleanup method for the baseline sample:
+
+- source raw recipe: `outside_surface`-style single prompt with three right-hand constraints
+- accepted variant: `right_arm_g1_hinge_line_refit_smooth_body_default_return_no_taper`
+- key decision: optimize only legal G1 right-arm hinge DoFs, then return the right arm to a body-relative frame-0 default posture
+- current status: accepted for this baseline sample and applied to the 27-position wall-brush grid; right-shifted wide strokes remain the main visual-review edge cases
