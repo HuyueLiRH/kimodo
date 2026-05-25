@@ -77,3 +77,21 @@ It should not contain `FILTERED` or `transition_filtered`.
 ## Observed Direction
 
 Prompt wording is the strongest lever for this task. Increasing constraint CFG alone made motions stiffer and less natural in strictness experiments. Keep `cfg_constraint=4.0` as the baseline unless there is a specific reason to retune.
+
+## Accepted One-Row Postprocessed Prior
+
+The current accepted one-row wall-brush prior collection is documented in:
+
+```text
+docs/wall_brush/one_row_g1_hinge_default_return.md
+```
+
+That collection uses the accepted single prompt plus a 27-position constraint
+grid, then applies the G1 hinge-space default-return treatment:
+
+```text
+examples/wall_brush/postprocess_treatments/g1_hinge_default_return_no_taper.json
+```
+
+The raw motions remain preserved. The accepted outputs are postprocessed
+building-motion priors with explicit raw-to-postprocessed lineage.
