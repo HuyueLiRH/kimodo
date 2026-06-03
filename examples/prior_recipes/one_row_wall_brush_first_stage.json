@@ -1,0 +1,135 @@
+{
+  "task_name": "one_row_wall_brush_first_stage",
+  "model": "kimodo-g1-rp",
+  "duration_frames": 102,
+  "geometry": {
+    "coordinate_system": "Y-up world coordinates in meters",
+    "wall_surface_z": 0.45,
+    "brush_length_m": 0.17,
+    "generation_point_rule": "Use only start/mid/end wall-contact anchors for first-stage raw generation. true_point is the wall/brush-tip point and position is the right-hand constraint point at the same x/y, shifted toward the body by brush_length_m along -Z."
+  },
+  "constraints": [
+    {
+      "label": "row_1_start",
+      "end_effector": "right-hand",
+      "frame": 36,
+      "position": [-0.12, 0.92, 0.28],
+      "true_point": [-0.12, 0.92, 0.45],
+      "coordinate_frame": "world",
+      "used_for_generation": true,
+      "show_in_review": true,
+      "used_for_postprocess": true,
+      "role": "brush_stroke_start"
+    },
+    {
+      "label": "row_1_mid",
+      "end_effector": "right-hand",
+      "frame": 51,
+      "position": [0.0, 0.92, 0.28],
+      "true_point": [0.0, 0.92, 0.45],
+      "coordinate_frame": "world",
+      "used_for_generation": true,
+      "show_in_review": true,
+      "used_for_postprocess": true,
+      "role": "brush_stroke_mid"
+    },
+    {
+      "label": "row_1_end",
+      "end_effector": "right-hand",
+      "frame": 66,
+      "position": [0.12, 0.92, 0.28],
+      "true_point": [0.12, 0.92, 0.45],
+      "coordinate_frame": "world",
+      "used_for_generation": true,
+      "show_in_review": true,
+      "used_for_postprocess": true,
+      "role": "brush_stroke_end"
+    }
+  ],
+  "candidates": [
+    {
+      "name": "outside_surface",
+      "seed": 7023,
+      "prompt_strategy": "composed_action_prompt",
+      "prompt_segments": [
+        {
+          "label": "approach",
+          "text": "A person stands still and moves the right hand directly toward the left edge of the outside surface of a small wall patch.",
+          "start_frame": 0,
+          "end_frame": 29,
+          "segment_source": "ai_suggested"
+        },
+        {
+          "label": "brush",
+          "text": "A person stands still and slides the right palm flat on the outside surface of a wall in one short straight horizontal stroke from left to right.",
+          "start_frame": 30,
+          "end_frame": 71,
+          "segment_source": "ai_suggested"
+        },
+        {
+          "label": "stop",
+          "text": "A person stands still, lowers the right hand directly to a neutral resting position beside the right thigh, and stops.",
+          "start_frame": 72,
+          "end_frame": 101,
+          "segment_source": "ai_suggested"
+        }
+      ]
+    },
+    {
+      "name": "left_arm_relaxed",
+      "seed": 7023,
+      "prompt_strategy": "composed_action_prompt",
+      "prompt_segments": [
+        {
+          "label": "approach",
+          "text": "A person stands balanced in place in front of a small wall patch, keeps the left arm relaxed by the side, and moves the right hand directly toward the left edge of the wall patch.",
+          "start_frame": 0,
+          "end_frame": 29,
+          "segment_source": "ai_suggested"
+        },
+        {
+          "label": "brush",
+          "text": "A person keeps the left arm relaxed by the side while the right hand brushes one short straight horizontal stroke from left to right on a wall.",
+          "start_frame": 30,
+          "end_frame": 71,
+          "segment_source": "ai_suggested"
+        },
+        {
+          "label": "stop",
+          "text": "A person keeps the left arm relaxed by the side, lowers the right hand directly to a neutral resting position beside the right thigh, and stops.",
+          "start_frame": 72,
+          "end_frame": 101,
+          "segment_source": "ai_suggested"
+        }
+      ]
+    },
+    {
+      "name": "seed_upright_style",
+      "seed": 7023,
+      "prompt_strategy": "composed_action_prompt",
+      "prompt_segments": [
+        {
+          "label": "approach",
+          "text": "A person stands in an upright stance in front of a wall and moves the right hand directly toward the left edge of a small wall patch.",
+          "start_frame": 0,
+          "end_frame": 29,
+          "segment_source": "ai_suggested"
+        },
+        {
+          "label": "brush",
+          "text": "A person standing in an upright stance leans forward slightly and moves the right hand across the wall from left to right in one short horizontal stroke.",
+          "start_frame": 30,
+          "end_frame": 71,
+          "segment_source": "ai_suggested"
+        },
+        {
+          "label": "stop",
+          "text": "A person returns to an upright stance, lowers the right hand directly to a neutral resting position beside the right thigh, and stops.",
+          "start_frame": 72,
+          "end_frame": 101,
+          "segment_source": "ai_suggested"
+        }
+      ]
+    }
+  ]
+}

@@ -47,6 +47,11 @@ all = [
 [project.scripts]
 kimodo_gen = "kimodo.scripts.generate:main"
 kimodo_demo = "kimodo.demo:main"
+kimodo_web_equiv_gen = "kimodo.scripts.web_equivalent_generate:main"
+kimodo_prior_run = "kimodo.scripts.prior_run:main"
+kimodo_prior_viewer = "kimodo.scripts.prior_viewer:main"
+kimodo_prior_sync = "kimodo.scripts.sync_prior_run:main"
+kimodo_prior_recipe_note = "kimodo.scripts.prior_recipe_note:main"
 kimodo_textencoder = "kimodo.scripts.run_text_encoder_server:main"
 kimodo_convert = "kimodo.scripts.motion_convert:main"
 
