@@ -1,61 +1,109 @@
-# Wall Brush Raw Generation
+# Wall Brush Direct-From-Raw Generation
 
-This example package preserves the reproducible KIMODO/G1 wall-brushing raw-generation setup used in the HuyueLiRH experiments.
+This example package records the current default KIMODO/G1-RP wall-brushing prior workflow used in the HuyueLiRH building-motion experiments.
 
-The current validated raw pipelines are:
+The default pipeline is now:
 
-- `outside_surface`: quiet body motion and low extra turning
-- `left_arm_relaxed`: stronger brush-like coverage with relaxed left arm prompts
-- `seed_upright_style`: upright/leaning style baseline with visible brushing intent
+1. Generate a semantically natural raw motion through the KIMODO demo/web-equivalent generation path.
+2. Build a direct target from the raw motion: a straight right-hand line stroke through the declared brush constraints, followed by a body-relative default right-arm return.
+3. Refit once from raw to that target using legal G1 right-arm hinge DoFs.
+4. Review `raw` against `right_arm_g1_direct_from_raw_line_default_return` in the local prior viewer.
 
-These pipelines are intentionally **raw KIMODO generation**: no transition smoothing, no postprocessing, no IK, no V36 projection, and no many-seed candidate selection.
+This replaces the previous staged FABRIK/lightlock/intermediate G1 line-refit/default-return route as the default wall-brush cleanup method.
 
 ## Contents
 
-- `scripts/run_wall_brush_top3_seed_robustness_raw.py`: run the three validated prompt+constraint pipelines across requested seeds.
-- `scripts/remote_wall_brush_multiprompt_constraint_v34_flat.py`: KIMODO generation-time constraint runner used by the raw pipelines.
-- `scripts/create_kimodo_motion_gallery.py`: local HTML gallery builder for visual inspection.
-- `task_specs/top3_raw_pipelines/*/task_spec.json`: frozen prompt+constraint task specs for the three successful pipelines.
-- `skills/kimodo-wall-brush-raw-generation`: Codex skill for reproducing and continuing the raw-generation workflow.
-- `skills/kimodo-wall-brush`: broader historical wall-brush pipeline skill and defaults.
+- `scripts/direct_wall_brush_g1_from_raw.py`: local direct-from-raw postprocess for an existing raw run folder.
+- `scripts/remote_wall_brush_direct_from_raw_batch_runner.py`: remote batch runner that performs web-equivalent raw generation and direct postprocess from one batch target file.
+- `scripts/refit_g1_right_arm_hinge_to_target.py`: G1 hinge-space refit helper used by the direct postprocess.
+- `postprocess_treatments/direct_from_raw_g1_hinge_default_return.json`: accepted postprocess treatment definition.
+- `task_specs/one_row_wall_brush_108_direct_from_raw_batch.json`: stable-range 108 target batch.
+- `skills/kimodo-wall-brush`: default Codex skill and JSON pipeline metadata.
 
-## Run
+Historical raw prompt ablation assets remain under `task_specs/top3_raw_pipelines` and `skills/kimodo-wall-brush-raw-generation`.
 
-From this directory on a KIMODO environment:
+## Remote Batch Run
+
+Run from a KIMODO environment where the G1-RP model and demo embedding cache already exist:
 
 ```bash
-/root/miniconda3/bin/python scripts/run_wall_brush_top3_seed_robustness_raw.py \
-  --output_root outputs/wall_brush_prompt_ablation_top3_seed_raw \
-  --seeds 7023 8023 9023 \
-  --execute
+/root/miniconda3/bin/python examples/wall_brush/scripts/remote_wall_brush_direct_from_raw_batch_runner.py \
+  --batch examples/wall_brush/task_specs/one_row_wall_brush_108_direct_from_raw_batch.json \
+  --remote_root /root/autodl-tmp/KIMODO/work/prior_runs/wall_brush_generalization_108_direct_from_raw \
+  --kimodo_repo /root/autodl-tmp/KIMODO/work/kimodo \
+  --python /root/miniconda3/bin/python \
+  --device cuda:0 \
+  --resume \
+  --archive /root/autodl-tmp/KIMODO/work/prior_runs/wall_brush_generalization_108_direct_from_raw.tgz
 ```
 
-Expected output:
+The raw generation stage calls:
 
 ```text
-outputs/wall_brush_prompt_ablation_top3_seed_raw/top3_seed_robustness_raw_gallery.html
-outputs/wall_brush_prompt_ablation_top3_seed_raw/top3_seed_robustness_raw_summary.csv
+kimodo.scripts.web_equivalent_generate
 ```
 
-Verify that the generated gallery contains only `RAW` labels and no `FILTERED` or `transition_filtered` motions.
+The final review variant is:
+
+```text
+right_arm_g1_direct_from_raw_line_default_return
+```
+
+## Local Postprocess For Existing Raw Runs
+
+For an existing run folder with `raw/<candidate>/motion.npz` and `raw/<candidate>/recipe.json`:
+
+```bash
+PYTHONPATH=examples/wall_brush/scripts:. python examples/wall_brush/scripts/direct_wall_brush_g1_from_raw.py \
+  --run-root outputs/wall_brush_generalization_108 \
+  --device cpu \
+  --steps 1600 \
+  --resume
+```
+
+Expected output files:
+
+- `postprocessed/<candidate>/right_arm_g1_direct_from_raw_line_default_return_target/motion.npz`
+- `postprocessed/<candidate>/right_arm_g1_direct_from_raw_line_default_return/motion.npz`
+- `direct_from_raw_summary.csv`
+- `direct_from_raw_summary.json`
+- updated `manifest.json`, `metrics.json`, and `review.json`
+
+## Accepted Validation Snapshot
+
+Stable-range 108 batch, reviewed locally on 2026-05-26:
+
+- generated/postprocessed candidates: `108 / 108`
+- normal reach cases: `84`
+- extreme-x reach cases: `24`
+- direct constraint max error mean: `0.0043546306 m`
+- direct constraint max error worst: `0.0074151507 m`
+- direct line max distance mean: `0.0039349349 m`
+- direct stroke speed CV mean: `0.0894181033`
+- direct stroke x-backstep total: `0.0 m`
+
+Worst recorded constraint case:
+
+```text
+y0p84_xm0p12_w0p30_z0p48
+constraint max: 0.0074151507 m
+```
 
 ## Generation Defaults
 
 ```text
-variant: endpoint_wrist
+model: kimodo-g1-rp
+seed: 7023
+num_samples: 1
+prompt: A person stands still and slides the right palm flat on the outside surface of a wall from left to right.
+duration_frames: 102
+constraint_frames: [36, 51, 66]
 cfg_text: 2.4
 cfg_constraint: 4.0
 diffusion_steps: 200
-num_samples: 1
-frame_plan: 210
-preemphasis_preset: flat_B
-heading_mode: none
-prompt_variant: level_full_width
-num_transition_frames: 5
-active_hand: right
-disable_y_closed_loop: true
-disable_return_constraint: true
+num_transition_frames: 3
 post_processing: false
+brush_offset_m: 0.17
 ```
 
-See `docs/wall_brush/raw_generation.md` for more detail.
+See `docs/wall_brush/one_row_direct_from_raw.md` for the full rationale.
