@@ -2,11 +2,11 @@
   "schema_version": 1,
   "kind": "postprocessing_treatment",
   "name": "right_arm_g1_direct_from_raw_line_default_return",
-  "status": "accepted_default_for_one_row_wall_brush",
+  "status": "accepted_default_for_single_stroke_wall_brush",
   "accepted_date": "2026-05-26",
   "model_scope": "kimodo-g1-rp",
-  "task_scope": "one_row_wall_brush",
-  "description": "Postprocess a semantically clean raw KIMODO/G1-RP one-row wall-brush prior by directly fitting the right hand to a straight brush line and returning the right arm to the frame-0 G1 default posture using only legal G1 right-arm hinge DoFs.",
+  "task_scope": "single_stroke_wall_brush",
+  "description": "Postprocess a semantically clean raw KIMODO/G1-RP single-stroke wall-brush prior by directly fitting the right hand to a straight brush line and returning the right arm to the frame-0 G1 default posture using only legal G1 right-arm hinge DoFs. The stroke line may be horizontal, vertical, or another declared constraint direction.",
   "replaces_default": "right_arm_g1_hinge_line_refit_smooth_body_default_return_no_taper",
   "runner": {
     "local_script": "examples/wall_brush/scripts/direct_wall_brush_g1_from_raw.py",
@@ -34,7 +34,7 @@
   ],
   "target_construction": {
     "stroke_frames": [36, 51, 66],
-    "stroke_target": "Straight right-hand endpoint line through the declared brush-stroke constraints.",
+    "stroke_target": "Straight right-hand endpoint line through the declared brush-stroke constraints in the task's declared direction.",
     "return_frames": [67, 101],
     "return_target": "Frame-0 physical G1 right-arm hinge angles replayed relative to the current body/root pose.",
     "return_curve": "smootherstep",
@@ -69,6 +69,7 @@
     "constraint_max_worst_m": 0.007415150686916008,
     "line_max_mean_m": 0.003934934896011222,
     "stroke_speed_cv_mean": 0.08941810332025985,
-    "stroke_x_backstep_total_max_m": 0.0
+    "stroke_x_backstep_total_max_m": 0.0,
+    "stroke_progress_backstep_total_max_m": 0.0
   }
 }

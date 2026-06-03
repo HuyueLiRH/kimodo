@@ -146,6 +146,17 @@ Stable-range 108 batch:
 
 The accepted visual-review expectation is to inspect `raw` against `right_arm_g1_direct_from_raw_line_default_return` in the local prior viewer.
 
+Newer summaries also report direction-independent stroke progress metrics:
+
+```text
+progress_axis
+progress_direction
+progress_backstep_count
+progress_backstep_total_m
+```
+
+For this horizontal batch, `progress_axis` should be `x`. Keep `x_backstep_*` only as a backward-compatible horizontal field.
+
 ## Local Review
 
 ```bash

@@ -1,6 +1,6 @@
 ---
 name: kimodo-wall-brush
-description: Generate and review one-row KIMODO/G1-RP wall-brushing building-motion priors with web-equivalent raw generation and direct-from-raw G1 right-arm hinge postprocess.
+description: Generate and review single-stroke KIMODO/G1-RP wall-brushing building-motion priors with web-equivalent raw generation and direct-from-raw G1 right-arm hinge postprocess.
 ---
 
 # Kimodo Wall Brush
@@ -10,7 +10,7 @@ description: Generate and review one-row KIMODO/G1-RP wall-brushing building-mot
 Use this route for the current building-motion prior experiments:
 
 1. Generate raw KIMODO/G1-RP motion with the demo/web-equivalent interface.
-2. Use one single prompt and three right-hand constraint points for the one-row stroke.
+2. Use one single prompt and three right-hand constraint points for the declared single stroke.
 3. Build a direct line-stroke plus body-default-return target from the raw motion.
 4. Run one G1 right-arm hinge refit from raw to target.
 5. Review `raw` against `right_arm_g1_direct_from_raw_line_default_return`.
@@ -43,7 +43,7 @@ constraint_z = wall_z - brush_offset_m
 
 This approximates brush length and avoids placing the hand endpoint directly on the wall surface.
 
-## Current 108 Batch
+## Current Horizontal 108 Batch
 
 Use:
 
@@ -58,6 +58,31 @@ height_y = [0.84, 0.90, 0.96, 1.02]
 center_x = [-0.12, 0.00, 0.12]
 width_x = [0.18, 0.24, 0.30]
 wall_z = [0.42, 0.45, 0.48]
+```
+
+## Current Vertical 27 Batch
+
+Use:
+
+```text
+examples/wall_brush/task_specs/one_column_wall_brush_27_direct_from_raw_batch.json
+```
+
+Prompt:
+
+```text
+A person stands still and slides the right palm flat on the outside surface of a wall from bottom to top.
+```
+
+Grid:
+
+```text
+center_y = [0.90]
+center_x = [-0.12, 0.00, 0.12]
+stroke_height_y = [0.18, 0.24, 0.30]
+wall_z = [0.42, 0.45, 0.48]
+stroke_axis = y
+stroke_direction = bottom_to_top
 ```
 
 ## Remote Execution
@@ -75,6 +100,13 @@ Run:
 ```
 
 The runner calls `kimodo.scripts.web_equivalent_generate`, so the result should match the web UI generation style better than the old scripted route.
+
+For the vertical 27 batch, use the same command but replace the batch file and run root:
+
+```text
+--batch examples/wall_brush/task_specs/one_column_wall_brush_27_direct_from_raw_batch.json
+--remote_root /root/autodl-tmp/KIMODO/work/prior_runs/wall_brush_one_column_27_direct_from_raw
+```
 
 ## Postprocess
 
@@ -128,12 +160,13 @@ constraint_max_mean_m: 0.004354630561123724
 constraint_max_worst_m: 0.007415150686916008
 line_max_mean_m: 0.003934934896011222
 stroke_x_backstep_total_max_m: 0.0
+stroke_progress_backstep_total_max_m: 0.0
 ```
 
 The most important human review criteria are:
 
 - right hand moves directly to the stroke start without a high extra raise
-- right hand brushes one simple horizontal row without repeated scribbling
+- right hand brushes one simple declared line without repeated scribbling
 - left hand does not become the task hand
 - right arm stays plausible under G1 mesh visualization
 - after the stroke, the right arm returns naturally toward the default/debug pose

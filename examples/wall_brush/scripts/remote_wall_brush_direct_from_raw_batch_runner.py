@@ -224,14 +224,21 @@ def write_artifacts(remote_root: Path, batch: dict[str, Any], records: list[dict
         grid = record["grid_variant"]
         row = {
             "variant": name,
+            "stroke_axis": grid.get("stroke_axis", batch.get("grid", {}).get("stroke_axis", "x")),
+            "stroke_direction": grid.get("stroke_direction", batch.get("grid", {}).get("stroke_direction")),
+            "center_y": grid.get("center_y"),
             "height_y": grid.get("height_y"),
             "center_x": grid.get("center_x"),
+            "stroke_height_y": grid.get("stroke_height_y"),
             "width_x": grid.get("width_x"),
             "wall_z": grid.get("wall_z"),
             "constraint_z": grid.get("constraint_z"),
+            "bottom_y": grid.get("bottom_y"),
+            "top_y": grid.get("top_y"),
             "left_x": grid.get("left_x"),
             "right_x": grid.get("right_x"),
             "endpoint_abs_x_max": grid.get("endpoint_abs_x_max"),
+            "endpoint_abs_y_max": grid.get("endpoint_abs_y_max"),
             "risk_tag": grid.get("risk_tag"),
             "raw_motion": paths["raw_motion"],
             "final_motion": paths["final_motion"],
@@ -259,7 +266,7 @@ def write_artifacts(remote_root: Path, batch: dict[str, Any], records: list[dict
     task = {
         "task_name": batch["task_name"],
         "model": batch.get("model", "kimodo-g1-rp"),
-        "purpose": "Redesigned stable-range 108 wall-brush experiment using direct-from-raw postprocess.",
+        "purpose": "Wall-brush prior experiment using web-equivalent raw generation and direct-from-raw postprocess.",
         "prompt_segments": batch.get("prompt_segments", []),
         "grid": batch.get("grid", {}),
     }

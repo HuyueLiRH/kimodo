@@ -6,6 +6,10 @@
   "final_variant": "right_arm_g1_direct_from_raw_line_default_return",
   "target_variant": "right_arm_g1_direct_from_raw_line_default_return_target",
   "source_batch": "examples/wall_brush/task_specs/one_row_wall_brush_108_direct_from_raw_batch.json",
+  "available_batches": {
+    "one_row_horizontal_108": "examples/wall_brush/task_specs/one_row_wall_brush_108_direct_from_raw_batch.json",
+    "one_column_vertical_27": "examples/wall_brush/task_specs/one_column_wall_brush_27_direct_from_raw_batch.json"
+  },
   "pipeline": [
     "read batch_targets.json",
     "generate one raw KIMODO/G1-RP motion per target with kimodo.scripts.web_equivalent_generate",
@@ -26,7 +30,8 @@
     "constraint_max_worst_m": 0.007415150686916008,
     "line_max_mean_m": 0.003934934896011222,
     "stroke_speed_cv_mean": 0.08941810332025985,
-    "stroke_x_backstep_total_max_m": 0.0
+    "stroke_x_backstep_total_max_m": 0.0,
+    "stroke_progress_backstep_total_max_m": 0.0
   },
   "notes": [
     "This default replaces the previous staged FABRIK/lightlock/intermediate G1 line-refit/default-return route.",

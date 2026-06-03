@@ -1,7 +1,9 @@
 from __future__ import annotations
 
 import importlib.util
+import json
 import sys
+import tempfile
 import unittest
 from pathlib import Path
 
@@ -39,6 +41,52 @@ class DirectWallBrushTargetTests(unittest.TestCase):
         self.assertTrue(np.allclose(targets[25], [0.06, 0.92, 0.28]))
         self.assertNotIn(9, targets)
         self.assertNotIn(31, targets)
+
+    def test_metrics_report_stroke_progress_backstep_for_vertical_strokes(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            tmp_path = Path(tmp)
+            motion_path = tmp_path / "motion.npz"
+            recipe_path = tmp_path / "recipe.json"
+            posed = np.zeros((6, 34, 3), dtype=np.float32)
+            root = np.zeros((6, 3), dtype=np.float32)
+            posed[1, direct.RIGHT_HAND] = [0.0, 0.00, 0.25]
+            posed[2, direct.RIGHT_HAND] = [0.0, 0.20, 0.25]
+            posed[3, direct.RIGHT_HAND] = [0.0, 0.15, 0.25]
+            posed[4, direct.RIGHT_HAND] = [0.0, 0.30, 0.25]
+            np.savez(motion_path, posed_joints=posed, root_positions=root)
+            recipe_path.write_text(
+                json.dumps(
+                    {
+                        "candidate": {
+                            "constraints": [
+                                {
+                                    "label": "column_1_start",
+                                    "end_effector": "right-hand",
+                                    "frame": 1,
+                                    "position": [0.0, 0.00, 0.25],
+                                    "used_for_postprocess": True,
+                                    "role": "brush_stroke_start",
+                                },
+                                {
+                                    "label": "column_1_end",
+                                    "end_effector": "right-hand",
+                                    "frame": 4,
+                                    "position": [0.0, 0.30, 0.25],
+                                    "used_for_postprocess": True,
+                                    "role": "brush_stroke_end",
+                                },
+                            ]
+                        }
+                    }
+                ),
+                encoding="utf-8",
+            )
+
+            metrics = direct.compute_basic_metrics(motion_path, recipe_path)
+
+        self.assertEqual(metrics["stroke_hand_speed"]["progress_axis"], "y")
+        self.assertEqual(metrics["stroke_hand_speed"]["progress_backstep_count"], 1)
+        self.assertAlmostEqual(metrics["stroke_hand_speed"]["progress_backstep_total_m"], 0.05, places=6)
 
 
 if __name__ == "__main__":

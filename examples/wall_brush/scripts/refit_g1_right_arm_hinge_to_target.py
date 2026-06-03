@@ -134,6 +134,44 @@ def line_distance(hand: np.ndarray, constraints: list[dict[str, Any]]) -> dict[s
     return {"mean_m": float(distances.mean()), "max_m": float(distances.max())}
 
 
+def stroke_progress_metrics(hand: np.ndarray, constraints: list[dict[str, Any]], start: int, end: int) -> dict[str, Any]:
+    if len(constraints) < 2:
+        return {
+            "progress_axis": "unknown",
+            "progress_direction": [0.0, 0.0, 0.0],
+            "progress_start_m": 0.0,
+            "progress_end_m": 0.0,
+            "progress_span_m": 0.0,
+            "progress_backstep_count": 0,
+            "progress_backstep_total_m": 0.0,
+        }
+    target_start = np.asarray(constraints[0]["point"], dtype=np.float64)
+    target_end = np.asarray(constraints[-1]["point"], dtype=np.float64)
+    stroke = hand[start : end + 1].astype(np.float64)
+    direction = target_end - target_start
+    norm = float(np.linalg.norm(direction))
+    if norm < 1e-12:
+        progress = np.zeros((stroke.shape[0],), dtype=np.float64)
+        unit = np.zeros((3,), dtype=np.float64)
+    else:
+        unit = direction / norm
+        progress = (stroke - target_start[None]) @ unit
+    dprogress = np.diff(progress)
+    backsteps = np.maximum(-dprogress, 0.0)
+    axis_names = ["x", "y", "z"]
+    axis_idx = int(np.argmax(np.abs(unit)))
+    axis = axis_names[axis_idx] if abs(float(unit[axis_idx])) > 0.999 else "custom"
+    return {
+        "progress_axis": axis,
+        "progress_direction": unit.astype(float).tolist(),
+        "progress_start_m": float(progress[0]) if progress.size else 0.0,
+        "progress_end_m": float(progress[-1]) if progress.size else 0.0,
+        "progress_span_m": float(norm),
+        "progress_backstep_count": int(np.sum(dprogress < -1e-5)),
+        "progress_backstep_total_m": float(backsteps.sum()),
+    }
+
+
 def summarize(
     source: dict[str, np.ndarray],
     target: dict[str, np.ndarray],
@@ -188,6 +226,7 @@ def summarize(
             "max_step_m": float(steps.max()) if steps.size else 0.0,
             "x_backstep_count": int(np.sum(dx < -1e-5)),
             "x_backstep_total_m": float(np.maximum(-dx, 0.0).sum()),
+            **stroke_progress_metrics(hand, constraints, start, end),
         },
         "max_right_arm_joint_delta_m": float(right_arm_delta.max()),
         "mean_right_arm_joint_delta_m": float(right_arm_delta.mean()),

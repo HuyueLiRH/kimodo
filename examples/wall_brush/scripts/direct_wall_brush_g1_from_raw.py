@@ -216,6 +216,36 @@ def line_distance(hand: np.ndarray, constraints: list[dict[str, Any]]) -> dict[s
     return {"mean_m": float(distances.mean()), "max_m": float(distances.max())}
 
 
+def stroke_progress_metrics(hand: np.ndarray, constraints: list[dict[str, Any]]) -> dict[str, Any]:
+    start_frame = int(constraints[0]["frame"])
+    end_frame = int(constraints[-1]["frame"])
+    start = np.asarray(constraints[0]["point"], dtype=np.float64)
+    end = np.asarray(constraints[-1]["point"], dtype=np.float64)
+    stroke = hand[start_frame : end_frame + 1].astype(np.float64)
+    direction = end - start
+    norm = float(np.linalg.norm(direction))
+    if norm < 1e-12:
+        progress = np.zeros((stroke.shape[0],), dtype=np.float64)
+        unit = np.zeros((3,), dtype=np.float64)
+    else:
+        unit = direction / norm
+        progress = (stroke - start[None]) @ unit
+    dprogress = np.diff(progress)
+    backsteps = np.maximum(-dprogress, 0.0)
+    axis_names = ["x", "y", "z"]
+    axis_idx = int(np.argmax(np.abs(unit)))
+    axis = axis_names[axis_idx] if abs(float(unit[axis_idx])) > 0.999 else "custom"
+    return {
+        "progress_axis": axis,
+        "progress_direction": unit.astype(float).tolist(),
+        "progress_start_m": float(progress[0]) if progress.size else 0.0,
+        "progress_end_m": float(progress[-1]) if progress.size else 0.0,
+        "progress_span_m": float(norm),
+        "progress_backstep_count": int(np.sum(dprogress < -1e-5)),
+        "progress_backstep_total_m": float(backsteps.sum()),
+    }
+
+
 def compute_basic_metrics(motion_path: Path, recipe_path: Path) -> dict[str, Any]:
     motion = load_npz(motion_path)
     hand = motion["posed_joints"][:, RIGHT_HAND].astype(np.float64)
@@ -243,6 +273,7 @@ def compute_basic_metrics(motion_path: Path, recipe_path: Path) -> dict[str, Any
             "max_step_m": float(steps.max()) if steps.size else 0.0,
             "x_backstep_count": int(np.sum(dx < -1e-5)),
             "x_backstep_total_m": float(np.maximum(-dx, 0.0).sum()),
+            **stroke_progress_metrics(hand, constraints),
         },
         "root_drift": float(np.linalg.norm(root[-1] - root[0])) if root.shape[0] > 1 else 0.0,
         "final_hand_distance_to_initial_m": float(np.linalg.norm(hand[-1] - hand[0])),
@@ -353,6 +384,8 @@ def update_review_artifacts(run_root: Path, records: list[dict[str, Any]]) -> No
                 "constraint_max_m": record["metrics"]["constraint_error"]["max_m"],
                 "line_max_m": record["metrics"]["line_distance"]["max_m"],
                 "x_backstep_total_m": record["metrics"]["stroke_hand_speed"]["x_backstep_total_m"],
+                "progress_axis": record["metrics"]["stroke_hand_speed"]["progress_axis"],
+                "progress_backstep_total_m": record["metrics"]["stroke_hand_speed"]["progress_backstep_total_m"],
                 "speed_cv": record["metrics"]["stroke_hand_speed"]["cv"],
                 "motion": rel(record["output_motion"], run_root),
             }

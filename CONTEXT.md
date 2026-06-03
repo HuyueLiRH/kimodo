@@ -228,6 +228,10 @@ _Avoid_: Entire project scope, final benchmark suite.
 The first wall-brushing milestone: approach the wall, perform one clear horizontal brushing stroke, then return or stop naturally.
 _Avoid_: Full-wall coverage, multi-row painting.
 
+**One-Column Wall Brushing**:
+A wall-brushing milestone parallel to **One-Row Wall Brushing**: approach the wall, perform one clear vertical brushing stroke, then return or stop naturally.
+_Avoid_: Treating it as a renamed horizontal row task, full-wall coverage, multi-column painting.
+
 **Motion Quality First**:
 The admission priority that semantic cleanliness and lack of extraneous movement matter more than small end-effector trajectory errors.
 _Avoid_: Constraint-only ranking, metric-only acceptance.
@@ -249,6 +253,7 @@ _Avoid_: Constraint-calibration pose only, arbitrary generated first frame, visu
 - The **Building Motion Generation Project** produces a **Motion Prior Collection**.
 - Wall brushing is the first **Anchor Task** for the **Building Motion Generation Project**.
 - **One-Row Wall Brushing** is the first milestone of the wall-brushing **Anchor Task**.
+- **One-Column Wall Brushing** is a vertical-stroke sibling of **One-Row Wall Brushing**, not a replacement for it.
 - **One-Row Wall Brushing** follows **Motion Quality First** during early prior selection.
 - Early **One-Row Wall Brushing** is judged by **Semantic Task Success** before exact wall contact.
 - Early **One-Row Wall Brushing** should produce a **Candidate Prior Set** rather than a single locked-in motion.
