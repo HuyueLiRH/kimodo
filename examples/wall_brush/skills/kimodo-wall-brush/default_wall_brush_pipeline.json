@@ -1,0 +1,68 @@
+{
+  "task": "kimodo_g1_wall_brush",
+  "current_default_pipeline": true,
+  "name": "wall_brush_web_equivalent_raw_direct_from_raw_g1_hinge",
+  "description": "Generate single-stroke wall-brushing priors by matching the KIMODO demo/web generation route, then applying a single direct-from-raw G1 right-arm hinge refit to a line-stroke plus body-default-return target.",
+  "from_scratch": true,
+  "no_previous_motion_as_input": true,
+  "batch_target_file": "examples/wall_brush/task_specs/one_row_wall_brush_108_direct_from_raw_batch.json",
+  "available_batch_target_files": {
+    "one_row_horizontal_108": "examples/wall_brush/task_specs/one_row_wall_brush_108_direct_from_raw_batch.json",
+    "one_column_vertical_27": "examples/wall_brush/task_specs/one_column_wall_brush_27_direct_from_raw_batch.json"
+  },
+  "stages": {
+    "batch_target_loading": {
+      "input": "batch_targets.json",
+      "contains": [
+        "prompt_segments",
+        "right-hand constraint points",
+        "grid geometry",
+        "brush offset metadata"
+      ]
+    },
+    "web_equivalent_raw_generation": {
+      "script": "kimodo/scripts/web_equivalent_generate.py",
+      "model": "kimodo-g1-rp",
+      "seed": 7023,
+      "num_samples": 1,
+      "cfg_type": "separated",
+      "cfg_weight": [2.4, 4.0],
+      "num_denoising_steps": 200,
+      "num_transition_frames": 3,
+      "post_processing": false,
+      "output": "raw/<candidate>/motion.npz"
+    },
+    "direct_target_construction": {
+      "script": "examples/wall_brush/scripts/direct_wall_brush_g1_from_raw.py",
+      "variant": "right_arm_g1_direct_from_raw_line_default_return_target",
+      "rule": "right hand follows the interpolated brush constraint line during the stroke, then returns to the frame-0 body-relative G1 right-arm default pose"
+    },
+    "g1_hinge_refit": {
+      "script": "examples/wall_brush/scripts/refit_g1_right_arm_hinge_to_target.py",
+      "variant": "right_arm_g1_direct_from_raw_line_default_return",
+      "optimized_joints": [26, 27, 28, 29, 30, 31, 32],
+      "excluded_endpoint_joint": 33,
+      "steps": 1600
+    },
+    "review_artifacts": {
+      "outputs": [
+        "manifest.json",
+        "metrics.json",
+        "review.json",
+        "direct_from_raw_summary.csv",
+        "direct_from_raw_summary.json"
+      ],
+      "viewer": "kimodo/scripts/prior_viewer.py",
+      "default_review_variant": "right_arm_g1_direct_from_raw_line_default_return"
+    }
+  },
+  "accepted_validation": {
+    "batch": "wall_brush_generalization_108_stable_range_20260526",
+    "completed": "108/108",
+    "constraint_max_mean_m": 0.004354630561123724,
+    "constraint_max_worst_m": 0.007415150686916008,
+    "line_max_mean_m": 0.003934934896011222,
+    "stroke_x_backstep_total_max_m": 0.0,
+    "stroke_progress_backstep_total_max_m": 0.0
+  }
+}

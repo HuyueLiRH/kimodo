@@ -1,0 +1,379 @@
+{
+  "schema_version": 1,
+  "kind": "run_level_review_record",
+  "run": "wall_brush_generalization_27_smooth_return_20260521",
+  "review_date": "2026-05-25",
+  "model": "kimodo-g1-rp",
+  "candidate_count": 27,
+  "accepted_variant": "right_arm_g1_hinge_line_refit_smooth_body_default_return_no_taper",
+  "human_decision": "The 27 one-row wall-brush motions are visually acceptable as postprocessed building-motion priors.",
+  "admission_blockers": [],
+  "remaining_refinement_debt": [
+    "Right-shifted wide strokes are near the G1 right-arm reach/naturalness boundary and should remain flagged for future multi-row scaling.",
+    "These priors are still postprocessed prior motions, not final contact-accurate deployed control policies."
+  ],
+  "edge_cases": [
+    "y0p86_x0p08_w0p30",
+    "y0p92_x0p08_w0p30",
+    "y0p98_x0p08_w0p30"
+  ],
+  "candidates": {
+    "y0p86_xm0p08_w0p18": {
+      "status": "postprocessed_accepted",
+      "accepted_variant": "right_arm_g1_hinge_line_refit_smooth_body_default_return_no_taper",
+      "notes": "Accepted after visual review. Use the G1 hinge default-return postprocessed variant as the reusable prior; keep raw-to-postprocessed lineage.",
+      "refinement_debt": [],
+      "metrics": {
+        "constraint_max_m": 0.002657981764165535,
+        "line_max_m": 0.0020410384561508873,
+        "final_to_default_target_m": 0.0014852191088721156,
+        "return_max_step_m": 0.019137676805257797
+      },
+      "artifact": "postprocessed/y0p86_xm0p08_w0p18/right_arm_g1_hinge_line_refit_smooth_body_default_return_no_taper/motion.npz"
+    },
+    "y0p86_xm0p08_w0p24": {
+      "status": "postprocessed_accepted",
+      "accepted_variant": "right_arm_g1_hinge_line_refit_smooth_body_default_return_no_taper",
+      "notes": "Accepted after visual review. Use the G1 hinge default-return postprocessed variant as the reusable prior; keep raw-to-postprocessed lineage.",
+      "refinement_debt": [],
+      "metrics": {
+        "constraint_max_m": 0.003268066906407615,
+        "line_max_m": 0.0020387402208570495,
+        "final_to_default_target_m": 0.0019338452257215977,
+        "return_max_step_m": 0.020715389400720596
+      },
+      "artifact": "postprocessed/y0p86_xm0p08_w0p24/right_arm_g1_hinge_line_refit_smooth_body_default_return_no_taper/motion.npz"
+    },
+    "y0p86_xm0p08_w0p30": {
+      "status": "postprocessed_accepted",
+      "accepted_variant": "right_arm_g1_hinge_line_refit_smooth_body_default_return_no_taper",
+      "notes": "Accepted after visual review. Use the G1 hinge default-return postprocessed variant as the reusable prior; keep raw-to-postprocessed lineage.",
+      "refinement_debt": [],
+      "metrics": {
+        "constraint_max_m": 0.0055467510357905,
+        "line_max_m": 0.0022598257241803364,
+        "final_to_default_target_m": 0.0023747871164232492,
+        "return_max_step_m": 0.022173624485731125
+      },
+      "artifact": "postprocessed/y0p86_xm0p08_w0p30/right_arm_g1_hinge_line_refit_smooth_body_default_return_no_taper/motion.npz"
+    },
+    "y0p86_x0p00_w0p18": {
+      "status": "postprocessed_accepted",
+      "accepted_variant": "right_arm_g1_hinge_line_refit_smooth_body_default_return_no_taper",
+      "notes": "Accepted after visual review. Use the G1 hinge default-return postprocessed variant as the reusable prior; keep raw-to-postprocessed lineage.",
+      "refinement_debt": [],
+      "metrics": {
+        "constraint_max_m": 0.0030249084145692142,
+        "line_max_m": 0.0021701950006870166,
+        "final_to_default_target_m": 0.0019427406368777156,
+        "return_max_step_m": 0.02291942574083805
+      },
+      "artifact": "postprocessed/y0p86_x0p00_w0p18/right_arm_g1_hinge_line_refit_smooth_body_default_return_no_taper/motion.npz"
+    },
+    "y0p86_x0p00_w0p24": {
+      "status": "postprocessed_accepted",
+      "accepted_variant": "right_arm_g1_hinge_line_refit_smooth_body_default_return_no_taper",
+      "notes": "Accepted after visual review. Use the G1 hinge default-return postprocessed variant as the reusable prior; keep raw-to-postprocessed lineage.",
+      "refinement_debt": [],
+      "metrics": {
+        "constraint_max_m": 0.0046859313059451685,
+        "line_max_m": 0.0023810824257190382,
+        "final_to_default_target_m": 0.002538108266890049,
+        "return_max_step_m": 0.024257371202111244
+      },
+      "artifact": "postprocessed/y0p86_x0p00_w0p24/right_arm_g1_hinge_line_refit_smooth_body_default_return_no_taper/motion.npz"
+    },
+    "y0p86_x0p00_w0p30": {
+      "status": "postprocessed_accepted",
+      "accepted_variant": "right_arm_g1_hinge_line_refit_smooth_body_default_return_no_taper",
+      "notes": "Accepted after visual review. Use the G1 hinge default-return postprocessed variant as the reusable prior; keep raw-to-postprocessed lineage.",
+      "refinement_debt": [],
+      "metrics": {
+        "constraint_max_m": 0.009174469575523312,
+        "line_max_m": 0.00213791162867038,
+        "final_to_default_target_m": 0.0026304314378648996,
+        "return_max_step_m": 0.025245221331715584
+      },
+      "artifact": "postprocessed/y0p86_x0p00_w0p30/right_arm_g1_hinge_line_refit_smooth_body_default_return_no_taper/motion.npz"
+    },
+    "y0p86_x0p08_w0p18": {
+      "status": "postprocessed_accepted",
+      "accepted_variant": "right_arm_g1_hinge_line_refit_smooth_body_default_return_no_taper",
+      "notes": "Accepted after visual review. Use the G1 hinge default-return postprocessed variant as the reusable prior; keep raw-to-postprocessed lineage.",
+      "refinement_debt": [],
+      "metrics": {
+        "constraint_max_m": 0.005267377132291685,
+        "line_max_m": 0.0015548571430101408,
+        "final_to_default_target_m": 0.0025473702698946,
+        "return_max_step_m": 0.0269454512745142
+      },
+      "artifact": "postprocessed/y0p86_x0p08_w0p18/right_arm_g1_hinge_line_refit_smooth_body_default_return_no_taper/motion.npz"
+    },
+    "y0p86_x0p08_w0p24": {
+      "status": "postprocessed_accepted",
+      "accepted_variant": "right_arm_g1_hinge_line_refit_smooth_body_default_return_no_taper",
+      "notes": "Accepted after visual review. Use the G1 hinge default-return postprocessed variant as the reusable prior; keep raw-to-postprocessed lineage.",
+      "refinement_debt": [],
+      "metrics": {
+        "constraint_max_m": 0.011467593385068187,
+        "line_max_m": 0.0033341001149816835,
+        "final_to_default_target_m": 0.0026497659273445606,
+        "return_max_step_m": 0.028447916731238365
+      },
+      "artifact": "postprocessed/y0p86_x0p08_w0p24/right_arm_g1_hinge_line_refit_smooth_body_default_return_no_taper/motion.npz"
+    },
+    "y0p86_x0p08_w0p30": {
+      "status": "postprocessed_accepted",
+      "accepted_variant": "right_arm_g1_hinge_line_refit_smooth_body_default_return_no_taper",
+      "notes": "Accepted, but keep flagged: right-shifted wide stroke has the highest constraint max error and is near the G1 reach/naturalness boundary.",
+      "refinement_debt": [
+        "Reach/naturalness edge case for future scaling."
+      ],
+      "metrics": {
+        "constraint_max_m": 0.022642242106915966,
+        "line_max_m": 0.008056692447962236,
+        "final_to_default_target_m": 0.0026909562293440104,
+        "return_max_step_m": 0.030130423605442047
+      },
+      "artifact": "postprocessed/y0p86_x0p08_w0p30/right_arm_g1_hinge_line_refit_smooth_body_default_return_no_taper/motion.npz"
+    },
+    "y0p92_xm0p08_w0p18": {
+      "status": "postprocessed_accepted",
+      "accepted_variant": "right_arm_g1_hinge_line_refit_smooth_body_default_return_no_taper",
+      "notes": "Accepted after visual review. Use the G1 hinge default-return postprocessed variant as the reusable prior; keep raw-to-postprocessed lineage.",
+      "refinement_debt": [],
+      "metrics": {
+        "constraint_max_m": 0.0030333699333952684,
+        "line_max_m": 0.002309696198413948,
+        "final_to_default_target_m": 0.0012449874775484204,
+        "return_max_step_m": 0.021561846137046814
+      },
+      "artifact": "postprocessed/y0p92_xm0p08_w0p18/right_arm_g1_hinge_line_refit_smooth_body_default_return_no_taper/motion.npz"
+    },
+    "y0p92_xm0p08_w0p24": {
+      "status": "postprocessed_accepted",
+      "accepted_variant": "right_arm_g1_hinge_line_refit_smooth_body_default_return_no_taper",
+      "notes": "Accepted after visual review. Use the G1 hinge default-return postprocessed variant as the reusable prior; keep raw-to-postprocessed lineage.",
+      "refinement_debt": [],
+      "metrics": {
+        "constraint_max_m": 0.004050150443780022,
+        "line_max_m": 0.0021331341212620612,
+        "final_to_default_target_m": 0.0018717992352321744,
+        "return_max_step_m": 0.023282401263713837
+      },
+      "artifact": "postprocessed/y0p92_xm0p08_w0p24/right_arm_g1_hinge_line_refit_smooth_body_default_return_no_taper/motion.npz"
+    },
+    "y0p92_xm0p08_w0p30": {
+      "status": "postprocessed_accepted",
+      "accepted_variant": "right_arm_g1_hinge_line_refit_smooth_body_default_return_no_taper",
+      "notes": "Accepted after visual review. Use the G1 hinge default-return postprocessed variant as the reusable prior; keep raw-to-postprocessed lineage.",
+      "refinement_debt": [],
+      "metrics": {
+        "constraint_max_m": 0.00519034866668301,
+        "line_max_m": 0.002354344175732716,
+        "final_to_default_target_m": 0.002371267881244421,
+        "return_max_step_m": 0.024921434000134468
+      },
+      "artifact": "postprocessed/y0p92_xm0p08_w0p30/right_arm_g1_hinge_line_refit_smooth_body_default_return_no_taper/motion.npz"
+    },
+    "y0p92_x0p00_w0p18": {
+      "status": "postprocessed_accepted",
+      "accepted_variant": "right_arm_g1_hinge_line_refit_smooth_body_default_return_no_taper",
+      "notes": "Accepted after visual review. Use the G1 hinge default-return postprocessed variant as the reusable prior; keep raw-to-postprocessed lineage.",
+      "refinement_debt": [],
+      "metrics": {
+        "constraint_max_m": 0.0029438586136092365,
+        "line_max_m": 0.002300819074402618,
+        "final_to_default_target_m": 0.0020551083143800497,
+        "return_max_step_m": 0.02498011291027069
+      },
+      "artifact": "postprocessed/y0p92_x0p00_w0p18/right_arm_g1_hinge_line_refit_smooth_body_default_return_no_taper/motion.npz"
+    },
+    "y0p92_x0p00_w0p24": {
+      "status": "postprocessed_accepted",
+      "accepted_variant": "right_arm_g1_hinge_line_refit_smooth_body_default_return_no_taper",
+      "notes": "Accepted after visual review. Use the G1 hinge default-return postprocessed variant as the reusable prior; keep raw-to-postprocessed lineage.",
+      "refinement_debt": [],
+      "metrics": {
+        "constraint_max_m": 0.004448447335415032,
+        "line_max_m": 0.002243417173845769,
+        "final_to_default_target_m": 0.002297373488545418,
+        "return_max_step_m": 0.026415405794978142
+      },
+      "artifact": "postprocessed/y0p92_x0p00_w0p24/right_arm_g1_hinge_line_refit_smooth_body_default_return_no_taper/motion.npz"
+    },
+    "y0p92_x0p00_w0p30": {
+      "status": "postprocessed_accepted",
+      "accepted_variant": "right_arm_g1_hinge_line_refit_smooth_body_default_return_no_taper",
+      "notes": "Accepted after visual review. Use the G1 hinge default-return postprocessed variant as the reusable prior; keep raw-to-postprocessed lineage.",
+      "refinement_debt": [],
+      "metrics": {
+        "constraint_max_m": 0.009440572664004351,
+        "line_max_m": 0.002471969231867232,
+        "final_to_default_target_m": 0.0021541351452469826,
+        "return_max_step_m": 0.027601372450590134
+      },
+      "artifact": "postprocessed/y0p92_x0p00_w0p30/right_arm_g1_hinge_line_refit_smooth_body_default_return_no_taper/motion.npz"
+    },
+    "y0p92_x0p08_w0p18": {
+      "status": "postprocessed_accepted",
+      "accepted_variant": "right_arm_g1_hinge_line_refit_smooth_body_default_return_no_taper",
+      "notes": "Accepted after visual review. Use the G1 hinge default-return postprocessed variant as the reusable prior; keep raw-to-postprocessed lineage.",
+      "refinement_debt": [],
+      "metrics": {
+        "constraint_max_m": 0.004770794209683489,
+        "line_max_m": 0.0019836277194523644,
+        "final_to_default_target_m": 0.0027633067220449448,
+        "return_max_step_m": 0.03017597459256649
+      },
+      "artifact": "postprocessed/y0p92_x0p08_w0p18/right_arm_g1_hinge_line_refit_smooth_body_default_return_no_taper/motion.npz"
+    },
+    "y0p92_x0p08_w0p24": {
+      "status": "postprocessed_accepted",
+      "accepted_variant": "right_arm_g1_hinge_line_refit_smooth_body_default_return_no_taper",
+      "notes": "Accepted after visual review. Use the G1 hinge default-return postprocessed variant as the reusable prior; keep raw-to-postprocessed lineage.",
+      "refinement_debt": [],
+      "metrics": {
+        "constraint_max_m": 0.008490656214292765,
+        "line_max_m": 0.002748487346683223,
+        "final_to_default_target_m": 0.0029571345075964928,
+        "return_max_step_m": 0.030914293602108955
+      },
+      "artifact": "postprocessed/y0p92_x0p08_w0p24/right_arm_g1_hinge_line_refit_smooth_body_default_return_no_taper/motion.npz"
+    },
+    "y0p92_x0p08_w0p30": {
+      "status": "postprocessed_accepted",
+      "accepted_variant": "right_arm_g1_hinge_line_refit_smooth_body_default_return_no_taper",
+      "notes": "Accepted, but keep flagged: right-shifted wide stroke edge case.",
+      "refinement_debt": [
+        "Reach/naturalness edge case for future scaling."
+      ],
+      "metrics": {
+        "constraint_max_m": 0.016223283066917258,
+        "line_max_m": 0.00692126792575984,
+        "final_to_default_target_m": 0.0029469619039446115,
+        "return_max_step_m": 0.03274374455213547
+      },
+      "artifact": "postprocessed/y0p92_x0p08_w0p30/right_arm_g1_hinge_line_refit_smooth_body_default_return_no_taper/motion.npz"
+    },
+    "y0p98_xm0p08_w0p18": {
+      "status": "postprocessed_accepted",
+      "accepted_variant": "right_arm_g1_hinge_line_refit_smooth_body_default_return_no_taper",
+      "notes": "Accepted after visual review. Use the G1 hinge default-return postprocessed variant as the reusable prior; keep raw-to-postprocessed lineage.",
+      "refinement_debt": [],
+      "metrics": {
+        "constraint_max_m": 0.003910001930118283,
+        "line_max_m": 0.0017401465998247657,
+        "final_to_default_target_m": 0.0014756155433133245,
+        "return_max_step_m": 0.025045832619071007
+      },
+      "artifact": "postprocessed/y0p98_xm0p08_w0p18/right_arm_g1_hinge_line_refit_smooth_body_default_return_no_taper/motion.npz"
+    },
+    "y0p98_xm0p08_w0p24": {
+      "status": "postprocessed_accepted",
+      "accepted_variant": "right_arm_g1_hinge_line_refit_smooth_body_default_return_no_taper",
+      "notes": "Accepted after visual review. Use the G1 hinge default-return postprocessed variant as the reusable prior; keep raw-to-postprocessed lineage.",
+      "refinement_debt": [],
+      "metrics": {
+        "constraint_max_m": 0.007382203001815245,
+        "line_max_m": 0.0022632527296253093,
+        "final_to_default_target_m": 0.0018486727494746447,
+        "return_max_step_m": 0.02578912489116192
+      },
+      "artifact": "postprocessed/y0p98_xm0p08_w0p24/right_arm_g1_hinge_line_refit_smooth_body_default_return_no_taper/motion.npz"
+    },
+    "y0p98_xm0p08_w0p30": {
+      "status": "postprocessed_accepted",
+      "accepted_variant": "right_arm_g1_hinge_line_refit_smooth_body_default_return_no_taper",
+      "notes": "Accepted after visual review. Use the G1 hinge default-return postprocessed variant as the reusable prior; keep raw-to-postprocessed lineage.",
+      "refinement_debt": [],
+      "metrics": {
+        "constraint_max_m": 0.012327298853221846,
+        "line_max_m": 0.003298224169253609,
+        "final_to_default_target_m": 0.002305710455402732,
+        "return_max_step_m": 0.02675926871597767
+      },
+      "artifact": "postprocessed/y0p98_xm0p08_w0p30/right_arm_g1_hinge_line_refit_smooth_body_default_return_no_taper/motion.npz"
+    },
+    "y0p98_x0p00_w0p18": {
+      "status": "postprocessed_accepted",
+      "accepted_variant": "right_arm_g1_hinge_line_refit_smooth_body_default_return_no_taper",
+      "notes": "Accepted after visual review. Use the G1 hinge default-return postprocessed variant as the reusable prior; keep raw-to-postprocessed lineage.",
+      "refinement_debt": [],
+      "metrics": {
+        "constraint_max_m": 0.0035469470842184503,
+        "line_max_m": 0.001627994968918089,
+        "final_to_default_target_m": 0.001921634073369205,
+        "return_max_step_m": 0.027088744565844536
+      },
+      "artifact": "postprocessed/y0p98_x0p00_w0p18/right_arm_g1_hinge_line_refit_smooth_body_default_return_no_taper/motion.npz"
+    },
+    "y0p98_x0p00_w0p24": {
+      "status": "postprocessed_accepted",
+      "accepted_variant": "right_arm_g1_hinge_line_refit_smooth_body_default_return_no_taper",
+      "notes": "Accepted after visual review. Use the G1 hinge default-return postprocessed variant as the reusable prior; keep raw-to-postprocessed lineage.",
+      "refinement_debt": [],
+      "metrics": {
+        "constraint_max_m": 0.005227117396057511,
+        "line_max_m": 0.002108543268224551,
+        "final_to_default_target_m": 0.0020759340841323137,
+        "return_max_step_m": 0.02796792984008789
+      },
+      "artifact": "postprocessed/y0p98_x0p00_w0p24/right_arm_g1_hinge_line_refit_smooth_body_default_return_no_taper/motion.npz"
+    },
+    "y0p98_x0p00_w0p30": {
+      "status": "postprocessed_accepted",
+      "accepted_variant": "right_arm_g1_hinge_line_refit_smooth_body_default_return_no_taper",
+      "notes": "Accepted after visual review. Use the G1 hinge default-return postprocessed variant as the reusable prior; keep raw-to-postprocessed lineage.",
+      "refinement_debt": [],
+      "metrics": {
+        "constraint_max_m": 0.011591563645581645,
+        "line_max_m": 0.004921437922774556,
+        "final_to_default_target_m": 0.0022546681575477123,
+        "return_max_step_m": 0.029047170653939247
+      },
+      "artifact": "postprocessed/y0p98_x0p00_w0p30/right_arm_g1_hinge_line_refit_smooth_body_default_return_no_taper/motion.npz"
+    },
+    "y0p98_x0p08_w0p18": {
+      "status": "postprocessed_accepted",
+      "accepted_variant": "right_arm_g1_hinge_line_refit_smooth_body_default_return_no_taper",
+      "notes": "Accepted after visual review. Use the G1 hinge default-return postprocessed variant as the reusable prior; keep raw-to-postprocessed lineage.",
+      "refinement_debt": [],
+      "metrics": {
+        "constraint_max_m": 0.005311073776173413,
+        "line_max_m": 0.0021933416421168923,
+        "final_to_default_target_m": 0.0022834832780063152,
+        "return_max_step_m": 0.03028346784412861
+      },
+      "artifact": "postprocessed/y0p98_x0p08_w0p18/right_arm_g1_hinge_line_refit_smooth_body_default_return_no_taper/motion.npz"
+    },
+    "y0p98_x0p08_w0p24": {
+      "status": "postprocessed_accepted",
+      "accepted_variant": "right_arm_g1_hinge_line_refit_smooth_body_default_return_no_taper",
+      "notes": "Accepted after visual review. Use the G1 hinge default-return postprocessed variant as the reusable prior; keep raw-to-postprocessed lineage.",
+      "refinement_debt": [],
+      "metrics": {
+        "constraint_max_m": 0.008953565092169566,
+        "line_max_m": 0.004544095214594349,
+        "final_to_default_target_m": 0.0028251048643141985,
+        "return_max_step_m": 0.03271817788481712
+      },
+      "artifact": "postprocessed/y0p98_x0p08_w0p24/right_arm_g1_hinge_line_refit_smooth_body_default_return_no_taper/motion.npz"
+    },
+    "y0p98_x0p08_w0p30": {
+      "status": "postprocessed_accepted",
+      "accepted_variant": "right_arm_g1_hinge_line_refit_smooth_body_default_return_no_taper",
+      "notes": "Accepted, but keep flagged: high/right-shifted wide stroke edge case.",
+      "refinement_debt": [
+        "Reach/naturalness edge case for future scaling."
+      ],
+      "metrics": {
+        "constraint_max_m": 0.015159672678057418,
+        "line_max_m": 0.00843156773477459,
+        "final_to_default_target_m": 0.0028529248666018248,
+        "return_max_step_m": 0.034470152109861374
+      },
+      "artifact": "postprocessed/y0p98_x0p08_w0p30/right_arm_g1_hinge_line_refit_smooth_body_default_return_no_taper/motion.npz"
+    }
+  }
+}

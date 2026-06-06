@@ -1,0 +1,42 @@
+{
+  "task": "kimodo_g1_wall_brush",
+  "current_default": true,
+  "full_pipeline_spec": "skills/kimodo-wall-brush/default_wall_brush_pipeline.json",
+  "method_label": "WEB_EQUIVALENT_RAW_DIRECT_FROM_RAW_G1_HINGE_DEFAULT_RETURN",
+  "final_variant": "right_arm_g1_direct_from_raw_line_default_return",
+  "target_variant": "right_arm_g1_direct_from_raw_line_default_return_target",
+  "source_batch": "examples/wall_brush/task_specs/one_row_wall_brush_108_direct_from_raw_batch.json",
+  "available_batches": {
+    "one_row_horizontal_108": "examples/wall_brush/task_specs/one_row_wall_brush_108_direct_from_raw_batch.json",
+    "one_column_vertical_27": "examples/wall_brush/task_specs/one_column_wall_brush_27_direct_from_raw_batch.json"
+  },
+  "pipeline": [
+    "read batch_targets.json",
+    "generate one raw KIMODO/G1-RP motion per target with kimodo.scripts.web_equivalent_generate",
+    "build a line-stroke plus body-default-return target from raw motion and recipe constraints",
+    "run one G1 right-arm hinge refit from raw to that target",
+    "write manifest/metrics/review artifacts for local prior_viewer review"
+  ],
+  "generation": {
+    "raw_generation_script": "kimodo/scripts/web_equivalent_generate.py",
+    "remote_batch_runner": "examples/wall_brush/scripts/remote_wall_brush_direct_from_raw_batch_runner.py",
+    "local_postprocess_runner": "examples/wall_brush/scripts/direct_wall_brush_g1_from_raw.py",
+    "refit_helper": "examples/wall_brush/scripts/refit_g1_right_arm_hinge_to_target.py"
+  },
+  "accepted_validation": {
+    "batch": "wall_brush_generalization_108_stable_range_20260526",
+    "candidate_count": 108,
+    "constraint_max_mean_m": 0.004354630561123724,
+    "constraint_max_worst_m": 0.007415150686916008,
+    "line_max_mean_m": 0.003934934896011222,
+    "stroke_speed_cv_mean": 0.08941810332025985,
+    "stroke_x_backstep_total_max_m": 0.0,
+    "stroke_progress_backstep_total_max_m": 0.0
+  },
+  "notes": [
+    "This default replaces the previous staged FABRIK/lightlock/intermediate G1 line-refit/default-return route.",
+    "Raw generation should use the web-equivalent demo interface, not the older constraint runner that produced different results from the web UI.",
+    "The final postprocess is one direct G1 hinge refit from raw to target, not a multi-stage staged postprocess.",
+    "Do not optimize arbitrary SO(3) right-arm rotations or directly rotate endpoint joint 33."
+  ]
+}

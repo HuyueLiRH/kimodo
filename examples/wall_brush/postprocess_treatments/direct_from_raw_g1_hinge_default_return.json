@@ -1,0 +1,75 @@
+{
+  "schema_version": 1,
+  "kind": "postprocessing_treatment",
+  "name": "right_arm_g1_direct_from_raw_line_default_return",
+  "status": "accepted_default_for_single_stroke_wall_brush",
+  "accepted_date": "2026-05-26",
+  "model_scope": "kimodo-g1-rp",
+  "task_scope": "single_stroke_wall_brush",
+  "description": "Postprocess a semantically clean raw KIMODO/G1-RP single-stroke wall-brush prior by directly fitting the right hand to a straight brush line and returning the right arm to the frame-0 G1 default posture using only legal G1 right-arm hinge DoFs. The stroke line may be horizontal, vertical, or another declared constraint direction.",
+  "replaces_default": "right_arm_g1_hinge_line_refit_smooth_body_default_return_no_taper",
+  "runner": {
+    "local_script": "examples/wall_brush/scripts/direct_wall_brush_g1_from_raw.py",
+    "remote_batch_script": "examples/wall_brush/scripts/remote_wall_brush_direct_from_raw_batch_runner.py",
+    "example_local_command": "PYTHONPATH=examples/wall_brush/scripts:. python examples/wall_brush/scripts/direct_wall_brush_g1_from_raw.py --run-root outputs/wall_brush_generalization_108 --device cpu --steps 1600 --resume",
+    "example_remote_command": "/root/miniconda3/bin/python examples/wall_brush/scripts/remote_wall_brush_direct_from_raw_batch_runner.py --batch examples/wall_brush/task_specs/one_row_wall_brush_108_direct_from_raw_batch.json --remote_root /root/autodl-tmp/KIMODO/work/prior_runs/wall_brush_generalization_108_direct_from_raw --kimodo_repo /root/autodl-tmp/KIMODO/work/kimodo --python /root/miniconda3/bin/python --device cuda:0 --resume"
+  },
+  "required_inputs": [
+    "raw/<candidate>/motion.npz",
+    "raw/<candidate>/recipe.json"
+  ],
+  "outputs": [
+    "postprocessed/<candidate>/right_arm_g1_direct_from_raw_line_default_return_target/motion.npz",
+    "postprocessed/<candidate>/right_arm_g1_direct_from_raw_line_default_return/motion.npz",
+    "direct_from_raw_summary.csv",
+    "direct_from_raw_summary.json",
+    "manifest.json",
+    "metrics.json",
+    "review.json"
+  ],
+  "lineage": [
+    "raw",
+    "right_arm_g1_direct_from_raw_line_default_return_target",
+    "right_arm_g1_direct_from_raw_line_default_return"
+  ],
+  "target_construction": {
+    "stroke_frames": [36, 51, 66],
+    "stroke_target": "Straight right-hand endpoint line through the declared brush-stroke constraints in the task's declared direction.",
+    "return_frames": [67, 101],
+    "return_target": "Frame-0 physical G1 right-arm hinge angles replayed relative to the current body/root pose.",
+    "return_curve": "smootherstep",
+    "no_taper_reason": "The final frame is part of the return target; end taper weakens the final default-pose return."
+  },
+  "direct_refit_params": {
+    "steps": 1600,
+    "lr": 0.012,
+    "pad": 8,
+    "threshold": 0.0001,
+    "taper_frames": 0,
+    "fps": 30.0,
+    "opt_joints": [26, 27, 28, 29, 30, 31, 32],
+    "target_loss_weight": 520.0,
+    "hand_loss_weight": 17000.0,
+    "pose_prior_weight": 8.0,
+    "angle_prior_weight": 10.0,
+    "angle_vel_weight": 180.0,
+    "angle_acc_weight": 340.0,
+    "hand_acc_weight": 5200.0
+  },
+  "robot_validity_constraints": {
+    "right_arm_physical_kimodo_joints": [26, 27, 28, 29, 30, 31, 32],
+    "right_hand_endpoint_joint": 33,
+    "exclude_endpoint_from_optimization": true,
+    "reason": "Only legal physical G1 hinge DoFs are optimized; the endpoint/helper joint is not directly rotated."
+  },
+  "accepted_validation": {
+    "batch": "wall_brush_generalization_108_stable_range_20260526",
+    "candidate_count": 108,
+    "constraint_max_mean_m": 0.004354630561123724,
+    "constraint_max_worst_m": 0.007415150686916008,
+    "line_max_mean_m": 0.003934934896011222,
+    "stroke_speed_cv_mean": 0.08941810332025985,
+    "stroke_x_backstep_total_max_m": 0.0,
+    "stroke_progress_backstep_total_max_m": 0.0
+  }
+}

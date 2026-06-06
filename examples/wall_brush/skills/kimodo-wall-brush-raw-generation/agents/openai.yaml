@@ -1,0 +1,4 @@
+interface:
+  display_name: "Kimodo Wall Brush Raw Generation"
+  short_description: "Raw KIMODO wall-brush reruns"
+  default_prompt: "Generate raw KIMODO wall-brush motions using the saved three-pipeline prompt+constraint setup and produce a gallery for visual inspection."
