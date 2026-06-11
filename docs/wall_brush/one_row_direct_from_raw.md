@@ -36,6 +36,7 @@ python -m kimodo.scripts.web_equivalent_generate \
   --output _generation/<candidate>/raw_generation \
   --device cuda:0 \
   --use-demo-embedding-cache \
+  --embedding-cache-root /root/.cache/kimodo_demo/embeddings \
   --embedding-cache-model-name kimodo-g1-rp \
   --embedding-cache-model-name Kimodo-G1-RP-v1 \
   --no-csv

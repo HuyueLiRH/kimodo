@@ -34,6 +34,7 @@ Run from a KIMODO environment where the G1-RP model and demo embedding cache alr
   --kimodo_repo /root/autodl-tmp/KIMODO/work/kimodo \
   --python /root/miniconda3/bin/python \
   --device cuda:0 \
+  --embedding-cache-root /root/.cache/kimodo_demo/embeddings \
   --resume \
   --archive /root/autodl-tmp/KIMODO/work/prior_runs/wall_brush_generalization_108_direct_from_raw.tgz
 ```
@@ -49,6 +50,13 @@ The raw generation stage calls:
 
 ```text
 kimodo.scripts.web_equivalent_generate
+```
+
+For a workstation account without writable `/root`, point the runner to that
+machine's copied demo embedding cache, for example:
+
+```text
+--embedding-cache-root /project/huyue/cache/kimodo_demo/embeddings
 ```
 
 The final review variant is:
