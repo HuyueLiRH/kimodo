@@ -82,14 +82,16 @@ def web_generation(
     kimodo_repo: Path,
     python: str,
     device: str,
+    embedding_cache_root: Path | None = None,
 ) -> None:
     output_dir.mkdir(parents=True, exist_ok=True)
+    default_hf_cache = os.environ.get("HF_HOME", "/root/autodl-tmp/huggingface")
     env = os.environ.copy()
     env.update(
         {
-            "HF_HOME": "/root/autodl-tmp/huggingface",
-            "HUGGINGFACE_CACHE_DIR": "/root/autodl-tmp/huggingface",
-            "TRANSFORMERS_CACHE": "/root/autodl-tmp/huggingface",
+            "HF_HOME": default_hf_cache,
+            "HUGGINGFACE_CACHE_DIR": os.environ.get("HUGGINGFACE_CACHE_DIR", default_hf_cache),
+            "TRANSFORMERS_CACHE": os.environ.get("TRANSFORMERS_CACHE", default_hf_cache),
             "HF_HUB_DISABLE_TELEMETRY": "1",
             "HF_HUB_DISABLE_XET": "1",
             "HF_HUB_OFFLINE": "1",
@@ -115,6 +117,8 @@ def web_generation(
         "Kimodo-G1-RP-v1",
         "--no-csv",
     ]
+    if embedding_cache_root is not None:
+        cmd.extend(["--embedding-cache-root", str(embedding_cache_root)])
     subprocess.run(cmd, cwd=kimodo_repo, env=env, check=True)
 
 
@@ -130,11 +134,19 @@ def raw_generation_step(
     kimodo_repo: Path,
     python: str,
     device: str,
+    embedding_cache_root: Path | None,
     resume: bool,
 ) -> None:
     if resume and paths["raw_motion"].exists():
         return
-    web_generation(paths["task_spec"], paths["generation_dir"], kimodo_repo=kimodo_repo, python=python, device=device)
+    web_generation(
+        paths["task_spec"],
+        paths["generation_dir"],
+        kimodo_repo=kimodo_repo,
+        python=python,
+        device=device,
+        embedding_cache_root=embedding_cache_root,
+    )
     if not paths["generated_motion"].exists():
         raise FileNotFoundError(f"Missing generated motion: {paths['generated_motion']}")
     paths["raw_motion"].parent.mkdir(parents=True, exist_ok=True)
@@ -342,6 +354,7 @@ def process_target(index: int, total: int, target: dict[str, Any], args: argpars
         kimodo_repo=args.kimodo_repo,
         python=args.python,
         device=args.device,
+        embedding_cache_root=args.embedding_cache_root,
         resume=args.resume,
     )
     log(f"[{index}/{total}] {name}: direct-from-raw refit")
@@ -362,6 +375,15 @@ def main() -> None:
     parser.add_argument("--resume", action="store_true")
     parser.add_argument("--limit", type=int, default=None)
     parser.add_argument("--steps", type=int, default=DIRECT_REFIT_PARAMS["steps"])
+    parser.add_argument(
+        "--embedding-cache-root",
+        type=Path,
+        default=None,
+        help=(
+            "Root directory for cached demo text embeddings passed to "
+            "kimodo.scripts.web_equivalent_generate. Omit to use that script's default."
+        ),
+    )
     parser.add_argument("--archive", type=Path, default=None)
     args = parser.parse_args()
 

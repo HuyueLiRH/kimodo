@@ -38,6 +38,7 @@ python -m kimodo.scripts.web_equivalent_generate \
   --output _generation/<candidate>/raw_generation \
   --device cuda:0 \
   --use-demo-embedding-cache \
+  --embedding-cache-root /root/.cache/kimodo_demo/embeddings \
   --embedding-cache-model-name kimodo-g1-rp \
   --embedding-cache-model-name Kimodo-G1-RP-v1 \
   --no-csv
@@ -120,6 +121,7 @@ The older `x_backstep_*` fields remain as horizontal-compatibility fields, but s
   --kimodo_repo /root/autodl-tmp/KIMODO/work/kimodo \
   --python /root/miniconda3/bin/python \
   --device cuda:0 \
+  --embedding-cache-root /root/.cache/kimodo_demo/embeddings \
   --resume \
   --archive /root/autodl-tmp/KIMODO/work/prior_runs/wall_brush_one_column_27_direct_from_raw.tgz
 ```

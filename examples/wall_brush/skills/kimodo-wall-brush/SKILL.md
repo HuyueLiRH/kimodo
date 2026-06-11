@@ -96,10 +96,13 @@ Run:
   --kimodo_repo /root/autodl-tmp/KIMODO/work/kimodo \
   --python /root/miniconda3/bin/python \
   --device cuda:0 \
+  --embedding-cache-root /root/.cache/kimodo_demo/embeddings \
   --resume
 ```
 
 The runner calls `kimodo.scripts.web_equivalent_generate`, so the result should match the web UI generation style better than the old scripted route.
+
+On non-root workstation accounts, set `--embedding-cache-root` to the copied demo embedding cache, such as `/project/huyue/cache/kimodo_demo/embeddings`.
 
 For the vertical 27 batch, use the same command but replace the batch file and run root:
 

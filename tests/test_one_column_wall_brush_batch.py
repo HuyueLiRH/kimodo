@@ -5,6 +5,7 @@ import sys
 import tempfile
 import unittest
 from pathlib import Path
+from unittest.mock import patch
 
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
@@ -120,6 +121,43 @@ class OneColumnWallBrushBatchTests(unittest.TestCase):
                 self.assertEqual(spec.end_effector.type, "right-hand")
                 self.assertEqual(len(spec.end_effector.targets), 3)
                 self.assertFalse(spec.post_processing)
+
+    def test_remote_generation_accepts_portable_embedding_cache_root(self) -> None:
+        from remote_wall_brush_direct_from_raw_batch_runner import web_generation
+
+        with tempfile.TemporaryDirectory() as tmp:
+            tmp_path = Path(tmp)
+            task_spec = tmp_path / "task.json"
+            task_spec.write_text("{}", encoding="utf-8")
+            kimodo_repo = tmp_path / "kimodo"
+            kimodo_repo.mkdir()
+            embedding_cache_root = tmp_path / "cache" / "kimodo_demo" / "embeddings"
+
+            with patch.dict(
+                "os.environ",
+                {
+                    "HF_HOME": str(tmp_path / "hf_home"),
+                    "HUGGINGFACE_CACHE_DIR": str(tmp_path / "hf_cache"),
+                    "TRANSFORMERS_CACHE": str(tmp_path / "transformers"),
+                },
+            ):
+                with patch("remote_wall_brush_direct_from_raw_batch_runner.subprocess.run") as run:
+                    web_generation(
+                        task_spec,
+                        tmp_path / "out",
+                        kimodo_repo=kimodo_repo,
+                        python="/env/bin/python",
+                        device="cuda:0",
+                        embedding_cache_root=embedding_cache_root,
+                    )
+
+        command = run.call_args.args[0]
+        env = run.call_args.kwargs["env"]
+        self.assertIn("--embedding-cache-root", command)
+        self.assertEqual(command[command.index("--embedding-cache-root") + 1], str(embedding_cache_root))
+        self.assertEqual(env["HF_HOME"], str(tmp_path / "hf_home"))
+        self.assertEqual(env["HUGGINGFACE_CACHE_DIR"], str(tmp_path / "hf_cache"))
+        self.assertEqual(env["TRANSFORMERS_CACHE"], str(tmp_path / "transformers"))
 
 
 if __name__ == "__main__":

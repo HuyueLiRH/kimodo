@@ -12,7 +12,7 @@
     "local_script": "examples/wall_brush/scripts/direct_wall_brush_g1_from_raw.py",
     "remote_batch_script": "examples/wall_brush/scripts/remote_wall_brush_direct_from_raw_batch_runner.py",
     "example_local_command": "PYTHONPATH=examples/wall_brush/scripts:. python examples/wall_brush/scripts/direct_wall_brush_g1_from_raw.py --run-root outputs/wall_brush_generalization_108 --device cpu --steps 1600 --resume",
-    "example_remote_command": "/root/miniconda3/bin/python examples/wall_brush/scripts/remote_wall_brush_direct_from_raw_batch_runner.py --batch examples/wall_brush/task_specs/one_row_wall_brush_108_direct_from_raw_batch.json --remote_root /root/autodl-tmp/KIMODO/work/prior_runs/wall_brush_generalization_108_direct_from_raw --kimodo_repo /root/autodl-tmp/KIMODO/work/kimodo --python /root/miniconda3/bin/python --device cuda:0 --resume"
+    "example_remote_command": "/root/miniconda3/bin/python examples/wall_brush/scripts/remote_wall_brush_direct_from_raw_batch_runner.py --batch examples/wall_brush/task_specs/one_row_wall_brush_108_direct_from_raw_batch.json --remote_root /root/autodl-tmp/KIMODO/work/prior_runs/wall_brush_generalization_108_direct_from_raw --kimodo_repo /root/autodl-tmp/KIMODO/work/kimodo --python /root/miniconda3/bin/python --device cuda:0 --embedding-cache-root /root/.cache/kimodo_demo/embeddings --resume"
   },
   "required_inputs": [
     "raw/<candidate>/motion.npz",
